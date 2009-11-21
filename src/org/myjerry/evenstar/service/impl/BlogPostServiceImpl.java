@@ -1,5 +1,6 @@
 package org.myjerry.evenstar.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 	}
 
 	@Override
-	public boolean deletePost(Long blogPostID) {
+	public boolean deletePost(Long blogPostID, Long blogID) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -55,7 +56,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 	}
 
 	@Override
-	public boolean unPublishPost(Long blogPostID) {
+	public boolean unPublishPost(Long blogPostID, Long blogID) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -88,6 +89,29 @@ public class BlogPostServiceImpl implements BlogPostService {
 	public long getTotalPosts() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public BlogPost getPost(Long blogPostID, Long blogID) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Collection<String> arguments = new ArrayList<String>();
+			arguments.add("blogID == blogIDParam");
+			arguments.add("postID == blogPostIDParam");
+			Query query = manager.newQuery(BlogPost.class, arguments);
+			query.declareParameters("Long blogIDParam, Long blogPostIDParam");
+			
+			BlogPost post = ((List<BlogPost>) query.execute(blogID, blogPostID)).get(0);
+			post.getContents();
+			
+			return manager.detachCopy(post);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			manager.close();
+		}
 	}
 
 }

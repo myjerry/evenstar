@@ -46,6 +46,13 @@ public class EditPostsController extends MultiActionController {
 	 */
 	public ModelAndView editPost(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView mav = new ModelAndView();
+		
+		Long postID = Long.parseLong(request.getParameter("postID"));
+		Long blogID = Long.parseLong(request.getParameter("blogID"));
+		BlogPost post = this.blogPostService.getPost(postID, blogID);
+		mav.addObject("post", post);
+		
+		mav.setViewName(".author.newpost");
 		return mav;
 	}
 

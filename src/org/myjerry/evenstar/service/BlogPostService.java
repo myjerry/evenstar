@@ -12,9 +12,11 @@ public interface BlogPostService {
 	
 	public boolean saveDraftPost(BlogPost blogPost);
 
-	public boolean deletePost(Long blogPostID);
+	public boolean deletePost(Long blogPostID, Long blogID);
 
-	public boolean unPublishPost(Long blogPostID);
+	public boolean unPublishPost(Long blogPostID, Long blogID);
+	
+	public BlogPost getPost(Long blogPostID, Long blogID);
 	
 	public Collection<BlogPost> getAllBlogPosts(Long blogID);
 	

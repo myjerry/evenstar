@@ -10,7 +10,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Text;
 
-@PersistenceCapable(identityType = IdentityType.APPLICATION)
+@PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class BlogPost {
 	
 	@PrimaryKey
@@ -87,7 +87,10 @@ public class BlogPost {
 	 * @return the contents
 	 */
 	public String getContents() {
-		return contents.getValue();
+		if(contents != null) {
+			return contents.getValue();
+		}
+		return null;
 	}
 
 	/**
