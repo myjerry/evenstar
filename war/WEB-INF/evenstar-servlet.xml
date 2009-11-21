@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+		  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<beans>
+
+	<!-- Configure the tiles implementation -->
+	<bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer" >
+		<property name="definitions" >
+			<list>
+				<value>/WEB-INF/config/tiles/tiles-defs.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Wiring the tiles implementation to view resolver -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver" >
+		<property name="viewClass">
+			<value>org.springframework.web.servlet.view.tiles2.TilesView</value>
+		</property>
+	</bean>
+	
+	<!-- Basic filename based view resolver -->
+	<bean name="forwardController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" >
+		<property name="prefix" value="." />
+	</bean>
+
+	<bean id="parameterMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+		<property name="paramName" value="_action" />
+	</bean>
+
+	<bean id="parameterMethodNameResolverWithDefaultMethod" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+		<property name="paramName" value="_action" />
+		<property name="defaultMethodName" value="view" />
+	</bean>
+	
+	<!-- Basic exception resolver -->
+	<!-- 
+	<bean name="exceptionResolver" class="org.myjerry.web.controller.MyJerryExceptionResolver" >
+		<property name="order" value="0" />
+	</bean> -->
+	
+	<bean name="urlTilenameController" class="org.springframework.web.servlet.mvc.UrlTilenameViewController" >
+		<property name="indexTile" value=".homePage" />
+		<property name="toLowercase" value="true" />
+		<property name="stripAfterLastDot" value="true" />
+		<property name="insertStartingDot" value="true" />
+	</bean>
+	
+	<import resource="config/spring/services-beans.xml" />
+	<import resource="config/spring/controller-beans.xml" />
+	<import resource="config/spring/url-mappings.xml" />
+	
+</beans>

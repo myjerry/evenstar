@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC 
+"-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+
+<tiles-definitions>
+
+	<definition name=".masterLayout" template="/WEB-INF/jsps/templates/master.jsp">
+		<put-attribute name="title" value="Blogging machine" />
+		<put-attribute name="leftnav" value="/WEB-INF/jsps/templates/leftnav.jsp" />
+		<put-attribute name="body" value="/WEB-INF/jsps/templates/blank.jsp" />
+	</definition>
+	
+	<!-- Main site pages -->
+	<definition name=".index" extends=".masterLayout">
+		<put-attribute name="title" value="Home"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/index.jsp" />
+	</definition>
+	
+	<definition name=".noaccess" extends=".masterLayout">
+		<put-attribute name="title" value="Access Denied"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/noaccess.jsp" />
+	</definition>
+	
+	<definition name=".handler.exceptions" extends=".masterLayout">
+		<put-attribute name="title" value="Oops! Something went wrong!"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/sorry.jsp" />
+	</definition>
+	
+	<definition name=".page.not.found" extends=".masterLayout">
+		<put-attribute name="title" value="Requested page not found"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/page_not_found.jsp" />
+	</definition>
+	
+	
+	<definition name=".admin" extends=".masterLayout">
+		<put-attribute name="title" value="Admin"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/admin/admin.jsp" />
+	</definition>
+
+	<definition name=".admin.create.blog" extends=".masterLayout">
+		<put-attribute name="title" value="Create Blog"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/admin/createBlog.jsp" />
+	</definition>
+	
+	<definition name=".admin.create.blog.complete" extends=".masterLayout">
+		<put-attribute name="title" value="Blog Created"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/admin/createBlogComplete.jsp" />
+	</definition>
+
+	<definition name=".author.newpost" extends=".masterLayout">
+		<put-attribute name="title" value="Create New Post"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/author/newPost.jsp" />
+	</definition>
+	
+	<definition name=".author.newpost.published" extends=".masterLayout">
+		<put-attribute name="title" value="Create New Post"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/author/newPostPublished.jsp" />
+	</definition>
+	
+	<definition name=".author.editposts" extends=".masterLayout">
+		<put-attribute name="title" value="Edit Posts"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/author/editPosts.jsp" />
+	</definition>
+	
+	<definition name=".startblogging" extends=".masterLayout">
+		<put-attribute name="title" value="Start Blogging"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/startBlogging.jsp" />
+	</definition>
+	
+	<definition name=".admin.layout" extends=".masterLayout">
+		<put-attribute name="title" value="Start Blogging"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/layout/index.jsp" />
+	</definition>
+	
+
+	<definition name=".admin.settings" extends=".masterLayout">
+		<put-attribute name="title" value="Settings - Basic"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/settings/index.jsp" />
+	</definition>
+	
+	<definition name=".admin.settings.format" extends=".masterLayout">
+		<put-attribute name="title" value="Settings - Post Format"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/settings/formatting.jsp" />
+	</definition>
+
+	<definition name=".admin.settings.comments" extends=".masterLayout">
+		<put-attribute name="title" value="Settings - Comments"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/settings/comments.jsp" />
+	</definition>
+	
+	<definition name=".admin.settings.archives" extends=".masterLayout">
+		<put-attribute name="title" value="Settings - Archiving"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/settings/archives.jsp" />
+	</definition>
+	
+	<definition name=".admin.settings.feed" extends=".masterLayout">
+		<put-attribute name="title" value="Settings - Site Feed"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/settings/feed.jsp" />
+	</definition>
+	
+	<definition name=".admin.settings.email" extends=".masterLayout">
+		<put-attribute name="title" value="Settings - Email"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/settings/email.jsp" />
+	</definition>
+	
+	<definition name=".admin.settings.openid" extends=".masterLayout">
+		<put-attribute name="title" value="Settings - OpenID"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/settings/openID.jsp" />
+	</definition>
+	
+	<definition name=".admin.settings.security" extends=".masterLayout">
+		<put-attribute name="title" value="Settings - Security Permissions"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/settings/security.jsp" />
+	</definition>
+	
+	<definition name=".admin.settings.tools" extends=".masterLayout">
+		<put-attribute name="title" value="Settings - Tools"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/settings/tools.jsp" />
+	</definition>
+	
+
+</tiles-definitions>

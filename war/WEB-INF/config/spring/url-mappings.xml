@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+		  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<beans>
+
+	<bean name="urlMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<prop key="/index.html">urlTilenameController</prop>
+				
+				<prop key="/noAccess.html">urlTilenameController</prop>
+				
+				<prop key="/admin.html">adminController</prop>
+				<prop key="/admin/createBlog.html">createBlogController</prop>
+				
+				<prop key="/admin/settings.html">urlTilenameController</prop>
+				<prop key="/admin/layout.html">urlTilenameController</prop>
+				 
+				<prop key="/startBlogging.html">urlTilenameController</prop>
+				
+				<prop key="/author/newPost.html">newPostController</prop>
+				<prop key="/author/editPosts.html">editPostsController</prop>
+				
+				<prop key="/admin/settings/format.html">urlTilenameController</prop>
+				<prop key="/admin/settings/comments.html">urlTilenameController</prop>
+				<prop key="/admin/settings/archives.html">urlTilenameController</prop>
+				<prop key="/admin/settings/feed.html">urlTilenameController</prop>
+				<prop key="/admin/settings/email.html">urlTilenameController</prop>
+				<prop key="/admin/settings/openID.html">urlTilenameController</prop>
+				<prop key="/admin/settings/security.html">urlTilenameController</prop>
+				<prop key="/admin/settings/tools.html">urlTilenameController</prop>
+				
+				<!-- For all other URIs that do not match, forward the user to a generic Page Not Found page. -->
+        		<prop key="/*.*">pageNotFoundController</prop>
+			</props>
+		</property>
+	</bean>
+	
+</beans>

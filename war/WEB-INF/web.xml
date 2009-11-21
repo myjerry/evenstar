@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns="http://java.sun.com/xml/ns/javaee"
+		xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+		xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+		
+	<display-name>Evenstar</display-name>
+	<description>Evenstar - Blogging Software</description>
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<servlet>
+		<servlet-name>evenstar</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>evenstar</servlet-name>
+		<url-pattern>*.html</url-pattern>
+	</servlet-mapping>
+	
+	<welcome-file-list>
+		<welcome-file>homepage.jsp</welcome-file>
+	</welcome-file-list>
+
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+	
+    <security-constraint>
+        <web-resource-collection>
+        	<url-pattern>/admin.html</url-pattern>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+	<error-page>
+        <error-code>403</error-code>
+        <location>/noAccess.html</location>
+    </error-page>
+    	
+	<taglib>
+		<taglib-uri>/WEB-INF/c.tld</taglib-uri>
+		<taglib-location>/WEB-INF/tld/c.tld</taglib-location>
+	</taglib>
+
+	<taglib>
+		<taglib-uri>/WEB-INF/fmt.tld</taglib-uri>
+		<taglib-location>/WEB-INF/tld/fmt.tld</taglib-location>
+	</taglib>
+
+	<taglib>
+		<taglib-uri>/WEB-INF/fn.tld</taglib-uri>
+		<taglib-location>/WEB-INF/tld/fn.tld</taglib-location>
+	</taglib>
+
+	<taglib>
+		<taglib-uri>/WEB-INF/myjerry.tld</taglib-uri>
+		<taglib-location>/WEB-INF/tld/myjerry.tld</taglib-location>
+	</taglib>
+
+</web-app>
