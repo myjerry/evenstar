@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-beanutils.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-collections.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-digester.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jiql.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jstl.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-web.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-webmvc.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/spring.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/tiles-api-2.0.7.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/tiles-core-2.0.7.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/tiles-jsp-2.0.7.jar"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/App Engine"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
+</classpath>
