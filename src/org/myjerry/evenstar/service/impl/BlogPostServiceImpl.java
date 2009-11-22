@@ -13,6 +13,9 @@ import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+
 public class BlogPostServiceImpl implements BlogPostService {
 
 	@Override
@@ -25,9 +28,15 @@ public class BlogPostServiceImpl implements BlogPostService {
 		blogPost.setPostedDate(ServerUtils.getServerDate());
 		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		
 		try {
-			manager.makePersistent(blogPost);
-			
+			if(blogPost.getPostID() == null) {
+				// create a new post
+				manager.makePersistent(blogPost);
+			} else {
+				// this post should be updated
+				
+			}
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -39,8 +48,20 @@ public class BlogPostServiceImpl implements BlogPostService {
 
 	@Override
 	public boolean deletePost(Long blogPostID, Long blogID) {
-		// TODO Auto-generated method stub
-		return false;
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Key key = KeyFactory.createKey(BlogPost.class.getSimpleName(), blogPostID); 
+			BlogPost post = manager.getObjectById(BlogPost.class, key);
+			if(post.getBlogID().equals(blogID)) {
+				manager.deletePersistent(post);
+				return true;
+			}
+			return false;
+		} catch(Exception e) {
+			return false;
+		} finally {
+			manager.close();
+		}
 	}
 
 	@Override
@@ -91,27 +112,21 @@ public class BlogPostServiceImpl implements BlogPostService {
 		return 0;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public BlogPost getPost(Long blogPostID, Long blogID) {
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		try {
-			Collection<String> arguments = new ArrayList<String>();
-			arguments.add("blogID == blogIDParam");
-			arguments.add("postID == blogPostIDParam");
-			Query query = manager.newQuery(BlogPost.class, arguments);
-			query.declareParameters("Long blogIDParam, Long blogPostIDParam");
-			
-			BlogPost post = ((List<BlogPost>) query.execute(blogID, blogPostID)).get(0);
-			post.getContents();
-			
-			return manager.detachCopy(post);
+			Key key = KeyFactory.createKey(BlogPost.class.getSimpleName(), blogPostID); 
+			BlogPost post = manager.getObjectById(BlogPost.class, key);
+			if(post.getBlogID().equals(blogID)) {
+				post.getContents();
+				return manager.detachCopy(post);
+			}			
 		} catch(Exception e) {
 			e.printStackTrace();
-			return null;
 		} finally {
 			manager.close();
 		}
+		return null;
 	}
-
 }

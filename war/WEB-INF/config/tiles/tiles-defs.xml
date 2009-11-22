@@ -64,6 +64,11 @@
 		<put-attribute name="body" value="/WEB-INF/jsps/author/editPosts.jsp" />
 	</definition>
 	
+	<definition name=".author.deletePost" extends=".masterLayout">
+		<put-attribute name="title" value="Delete Post"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/author/deletePost.jsp" />
+	</definition>
+	
 	<definition name=".startblogging" extends=".masterLayout">
 		<put-attribute name="title" value="Start Blogging"/>
 		<put-attribute name="body" value="/WEB-INF/jsps/startBlogging.jsp" />

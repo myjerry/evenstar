@@ -37,39 +37,6 @@ public class EditPostsController extends MultiActionController {
 	}
 	
 	/**
-	 * User action to edit the given post
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	public ModelAndView editPost(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ModelAndView mav = new ModelAndView();
-		
-		Long postID = Long.parseLong(request.getParameter("postID"));
-		Long blogID = Long.parseLong(request.getParameter("blogID"));
-		BlogPost post = this.blogPostService.getPost(postID, blogID);
-		mav.addObject("post", post);
-		
-		mav.setViewName(".author.newpost");
-		return mav;
-	}
-
-	/**
-	 * User action to delete the given post.
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	public ModelAndView deletePost(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ModelAndView mav = new ModelAndView();
-		return mav;
-	}
-
-	/**
 	 * @return the blogPostService
 	 */
 	public BlogPostService getBlogPostService() {

@@ -22,6 +22,8 @@
 				
 				<prop key="/author/newPost.html">newPostController</prop>
 				<prop key="/author/editPosts.html">editPostsController</prop>
+				<prop key="/author/post.html">postController</prop>
+				<prop key="/author/deletePost.html">deletePostController</prop>
 				
 				<prop key="/admin/settings/format.html">urlTilenameController</prop>
 				<prop key="/admin/settings/comments.html">urlTilenameController</prop>

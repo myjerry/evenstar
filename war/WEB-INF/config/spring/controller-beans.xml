@@ -26,5 +26,15 @@
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
 		<property name="blogPostService" ref="blogPostService" />
 	</bean>
+	
+	<bean name="postController" class="org.myjerry.evenstar.web.author.PostController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPostService" ref="blogPostService" />
+	</bean>
+	
+	<bean name="deletePostController" class="org.myjerry.evenstar.web.author.DeletePostController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPostService" ref="blogPostService" />
+	</bean>
 
 </beans>

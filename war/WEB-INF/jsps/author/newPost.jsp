@@ -10,10 +10,11 @@
 </script>
 
 <div class="form">
-	<form name="newPostForm" method="POST">
+	<form name="newPostForm" method="POST" action="/author/post.html">
 	
 		<input id="actionParam" name="_action" value="submit" type="hidden" />
 		<input name="blogID" value="${blogID}" type="hidden" />
+		<input name="postID" value="${postID}" type="hidden" />
 		
 		<div class="contain">
 		
