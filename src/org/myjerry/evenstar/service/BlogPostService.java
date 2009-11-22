@@ -22,5 +22,5 @@ public interface BlogPostService {
 	
 	public Collection<BlogPost> getBlogPosts(Long blogID, long page, long count);
 	
-	public long getTotalPosts();
+	public Long getTotalPosts(Long blogID);
 }

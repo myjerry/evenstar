@@ -1,6 +1,5 @@
 package org.myjerry.evenstar.service.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,8 +12,13 @@ import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 
 public class BlogPostServiceImpl implements BlogPostService {
 
@@ -82,6 +86,10 @@ public class BlogPostServiceImpl implements BlogPostService {
 		return false;
 	}
 
+	/**
+	 * Due to GAE Datastore restrictions only max 1000 posts will be returned by this method.
+	 * Use the {@link #getBlogPosts(Long, long, long)} method instead.  
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<BlogPost> getAllBlogPosts(Long blogID) {
@@ -107,9 +115,17 @@ public class BlogPostServiceImpl implements BlogPostService {
 	}
 
 	@Override
-	public long getTotalPosts() {
-		// TODO Auto-generated method stub
-		return 0;
+	public Long getTotalPosts(Long blogID) {
+		DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(BlogPost.class.getSimpleName());
+		query.setKeysOnly();
+		query.addFilter("blogID", FilterOperator.EQUAL, blogID);
+		FetchOptions fetchOptions = FetchOptions.Builder.withOffset(0).limit(Integer.MAX_VALUE);
+		PreparedQuery preparedQuery = datastoreService.prepare(query);
+		int size = preparedQuery.asList(fetchOptions).size();
+		
+		return new Long(size);
 	}
 
 	@Override

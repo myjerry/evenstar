@@ -5,6 +5,8 @@
 <div class="form">
 	<div class="contain">
 	
+		<h5>Total Posts: ${totalPosts}</h5>
+	
 		<c:forEach items="${posts}" var="post">
 			<div class="form-row">
 				<a href="/author/post.html?blogID=${blogID}&postID=${post.postID}" >Edit Post</a>
