@@ -70,8 +70,29 @@ public class BlogPostServiceImpl implements BlogPostService {
 
 	@Override
 	public boolean saveDraftPost(BlogPost blogPost) {
-		// TODO Auto-generated method stub
-		return false;
+		if(blogPost.getCreationDate() == null) {
+			blogPost.setCreationDate(ServerUtils.getServerDate());
+		}
+		blogPost.setLastUpdated(ServerUtils.getServerDate());
+		blogPost.setLastUpdateUser(GAEUserUtil.getUserID());
+		
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		
+		try {
+			if(blogPost.getPostID() == null) {
+				// create a new post
+				manager.makePersistent(blogPost);
+			} else {
+				// this post should be updated
+				
+			}
+			return true;
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			manager.close();
+		}
 	}
 
 	@Override
@@ -82,7 +103,19 @@ public class BlogPostServiceImpl implements BlogPostService {
 
 	@Override
 	public boolean unPublishPost(Long blogPostID, Long blogID) {
-		// TODO Auto-generated method stub
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Key key = KeyFactory.createKey(BlogPost.class.getSimpleName(), blogPostID); 
+			BlogPost post = manager.getObjectById(BlogPost.class, key);
+			if(post.getBlogID().equals(blogID)) {
+				post.setCreationDate(null);
+			}
+			return true;
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
 		return false;
 	}
 
@@ -109,8 +142,16 @@ public class BlogPostServiceImpl implements BlogPostService {
 	}
 
 	@Override
-	public Collection<BlogPost> getBlogPosts(Long blogID, long page, long count) {
-		// TODO Auto-generated method stub
+	public Collection<BlogPost> getBlogPosts(Long blogID, int offset, int count) {
+//		DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+//		
+//		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(BlogPost.class.getSimpleName());
+//		query.addFilter("blogID", FilterOperator.EQUAL, blogID);
+//		FetchOptions fetchOptions = FetchOptions.Builder.withOffset(offset).limit(count);
+//		PreparedQuery preparedQuery = datastoreService.prepare(query);
+//
+//		List<Entity> entities = preparedQuery.asList(fetchOptions);
+		
 		return null;
 	}
 

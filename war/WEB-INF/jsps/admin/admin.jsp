@@ -7,7 +7,17 @@ User: <mj:gae.user />
 
 <a href="/admin/createBlog.html">Create a blog</a>
 
-Current Blogs:
+<h1>Current Blogs</h1>
+
+<h5>Current Default Blog:
+	<c:if test="${not empty defaultBlog}">
+		${defaultBlog.title} (<a href="/admin/setDefaultBlog.html">Change</a>)
+	</c:if>
+	<c:if test="${empty defaultBlog}">
+		None (<a href="/admin/setDefaultBlog.html">Set Now</a>)
+	</c:if> 
+</h5>
+
 <c:if test="${not empty blogs}">
 	<c:forEach items="${blogs}" var="blog">
 		<h3>${blog.title}</h3>

@@ -6,13 +6,20 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.myjerry.evenstar.constants.PreferenceConstants;
 import org.myjerry.evenstar.model.Blog;
 import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
 import org.myjerry.evenstar.service.BlogService;
+import org.myjerry.evenstar.service.PreferenceService;
 import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
+import org.myjerry.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class BlogServiceImpl implements BlogService {
+	
+	@Autowired
+	private PreferenceService preferenceService;
 	
 	@Override
 	public boolean createBlog(String blogName, String blogAddress) {
@@ -82,6 +89,38 @@ public class BlogServiceImpl implements BlogService {
 		} finally {
 			manager.close();
 		}
+	}
+
+	@Override
+	public Long getDefaultBlogID() {
+		String blogID = this.preferenceService.getPreference(PreferenceConstants.DEFAULT_BLOG_ID);
+		if(StringUtils.isNotEmpty(blogID)) {
+			return new Long(blogID);
+		}
+		return null;
+	}
+
+	@Override
+	public boolean setDefaultBlogID(Long blogID) {
+		if(blogID != null) {
+			return this.preferenceService.setPreference(PreferenceConstants.DEFAULT_BLOG_ID, String.valueOf(blogID));
+		} else {
+			return this.preferenceService.deletePreference(PreferenceConstants.DEFAULT_BLOG_ID);
+		}
+	}
+
+	/**
+	 * @return the preferenceService
+	 */
+	public PreferenceService getPreferenceService() {
+		return preferenceService;
+	}
+
+	/**
+	 * @param preferenceService the preferenceService to set
+	 */
+	public void setPreferenceService(PreferenceService preferenceService) {
+		this.preferenceService = preferenceService;
 	}
 
 }

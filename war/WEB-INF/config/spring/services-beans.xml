@@ -5,8 +5,20 @@
 
 <beans>
 
-	<bean name="blogService" class="org.myjerry.evenstar.service.impl.BlogServiceImpl" />
+	<bean name="blogService" class="org.myjerry.evenstar.service.impl.BlogServiceImpl" >
+		<property name="preferenceService" ref="preferenceService" />
+	</bean>
 	
 	<bean name="blogPostService" class="org.myjerry.evenstar.service.impl.BlogPostServiceImpl" />
+	
+	<bean name="preferenceService" class="org.myjerry.evenstar.service.impl.PreferenceServiceImpl" />
+	
+	<bean name="blogPreferenceService" class="org.myjerry.evenstar.service.impl.BlogPreferenceServiceImpl" />
 
+	<bean name="commentService" class="org.myjerry.evenstar.service.impl.CommentServiceImpl" />
+	
+	<bean name="feedService" class="org.myjerry.evenstar.service.impl.FeedServiceImpl" />
+	
+	<bean name="blogEmalService" class="org.myjerry.evenstar.service.impl.BlogEmailServiceImpl" />
+	
 </beans>

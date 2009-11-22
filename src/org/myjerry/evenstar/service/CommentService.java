@@ -8,15 +8,15 @@ public interface CommentService {
 	
 	public boolean postComment(Comment comment);
 	
-	public boolean deleteComment(Long commentID);
+	public boolean deleteComment(Long commentID, Long postID, Long blogID);
 	
-	public boolean publishComment(Long commentID);
+	public boolean publishComment(Long commentID, Long postID, Long blogID);
 	
-	public Comment getComment(Long commentID);
+	public Comment getComment(Long commentID, Long postID, Long blogID);
 	
-	public Collection<Comment> getCommentsForPost(Long blogPostID);
+	public Collection<Comment> getCommentsForPost(Long postID, Long blogID);
 
 	public Collection<Comment> getAllUnpublishedComments();
 	
-	public Collection<Comment> getUnpublishedCommentsForPost(Long blogPostID);
+	public Collection<Comment> getUnpublishedCommentsForPost(Long postID, Long blogID);
 }

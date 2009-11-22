@@ -15,5 +15,8 @@ public interface BlogService {
 	public boolean existsBlogAddress(String blogAddress);
 	
 	public Collection<Blog> getAllBlogs();
+	
+	public Long getDefaultBlogID();
 
+	public boolean setDefaultBlogID(Long blogID);
 }

@@ -36,5 +36,10 @@
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
 		<property name="blogPostService" ref="blogPostService" />
 	</bean>
+	
+	<bean name="defaultBlogController" class="org.myjerry.evenstar.web.admin.DefaultBlogController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogService" ref="blogService" />
+	</bean>
 
 </beans>

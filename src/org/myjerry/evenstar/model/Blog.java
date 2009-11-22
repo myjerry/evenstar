@@ -30,14 +30,14 @@ public class Blog {
 	/**
 	 * @return the blogID
 	 */
-	public long getBlogID() {
+	public Long getBlogID() {
 		return blogID;
 	}
 
 	/**
 	 * @param blogID the blogID to set
 	 */
-	public void setBlogID(long blogID) {
+	public void setBlogID(Long blogID) {
 		this.blogID = blogID;
 	}
 
