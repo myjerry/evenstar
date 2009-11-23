@@ -8,15 +8,14 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class Preference {
 
 	@PrimaryKey
-	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Long prefID;
-	
-	@Persistent
-	private String key;
+	private String keyName;
 	
 	@Persistent
 	private String value;
@@ -28,31 +27,17 @@ public class Preference {
 	private Date lastUpdateTime;
 
 	/**
-	 * @return the prefID
-	 */
-	public Long getPrefID() {
-		return prefID;
-	}
-
-	/**
-	 * @param prefID the prefID to set
-	 */
-	public void setPrefID(Long prefID) {
-		this.prefID = prefID;
-	}
-
-	/**
 	 * @return the key
 	 */
 	public String getKey() {
-		return key;
+		return KeyFactory.stringToKey(keyName).getName();
 	}
 
 	/**
 	 * @param key the key to set
 	 */
 	public void setKey(String key) {
-		this.key = key;
+		this.keyName = key;
 	}
 
 	/**
