@@ -8,7 +8,7 @@
 	<bean name="urlMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
 		<property name="mappings">
 			<props>
-				<prop key="/index.html">urlTilenameController</prop>
+				<prop key="/index.html">blogHomeController</prop>
 				
 				<prop key="/noAccess.html">urlTilenameController</prop>
 				

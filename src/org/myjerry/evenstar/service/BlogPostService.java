@@ -20,7 +20,7 @@ public interface BlogPostService {
 	
 	public Collection<BlogPost> getAllBlogPosts(Long blogID);
 	
-	public Collection<BlogPost> getBlogPosts(Long blogID, int page, int count);
+	public Collection<BlogPost> getBlogPosts(Long blogID, int count);
 	
 	public Long getTotalPosts(Long blogID);
 }

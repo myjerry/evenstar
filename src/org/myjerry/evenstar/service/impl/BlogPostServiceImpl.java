@@ -141,17 +141,32 @@ public class BlogPostServiceImpl implements BlogPostService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<BlogPost> getBlogPosts(Long blogID, int offset, int count) {
-//		DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
-//		
-//		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(BlogPost.class.getSimpleName());
-//		query.addFilter("blogID", FilterOperator.EQUAL, blogID);
-//		FetchOptions fetchOptions = FetchOptions.Builder.withOffset(offset).limit(count);
-//		PreparedQuery preparedQuery = datastoreService.prepare(query);
-//
-//		List<Entity> entities = preparedQuery.asList(fetchOptions);
-		
+	public Collection<BlogPost> getBlogPosts(Long blogID, int count) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(BlogPost.class);
+	    query.setFilter("blogID == blogIDParam");
+	    query.setOrdering("postedDate desc");
+	    query.declareParameters("String blogIDParam");
+	    query.setRange(0, count + 1);
+	    
+	    try {
+	    	List<BlogPost> posts = (List<BlogPost>) query.execute(blogID);
+	    	if(posts != null) {
+	    		// take care of a GAE Bug
+	    		for(BlogPost post : posts) {
+	    			post.getContents(); // trash this get :(
+	    		}
+	    		return manager.detachCopyAll(posts);
+	    	}
+	    	return posts;
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
 		return null;
 	}
 

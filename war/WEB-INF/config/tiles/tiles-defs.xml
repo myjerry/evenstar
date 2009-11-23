@@ -135,5 +135,11 @@
 		<put-attribute name="body" value="/WEB-INF/jsps/settings/tools.jsp" />
 	</definition>
 	
+	
+	
+	<definition name=".view.blog.home" extends=".masterLayout">
+		<put-attribute name="title" value="Home"/>
+		<put-attribute name="body" value="/WEB-INF/jsps/blog/viewHome.jsp" />
+	</definition>
 
 </tiles-definitions>
