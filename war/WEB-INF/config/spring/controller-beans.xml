@@ -46,6 +46,13 @@
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
 		<property name="blogPostService" ref="blogPostService" />
 		<property name="blogService" ref="blogService" />
+		<property name="blogLayoutService" ref="blogLayoutService" />
+		<property name="velocityEngine" ref="velocityEngine" />
+	</bean>
+	
+	<bean name="layoutController" class="org.myjerry.evenstar.web.layout.LayoutController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogLayoutService" ref="blogLayoutService" />
 	</bean>
 
 </beans>

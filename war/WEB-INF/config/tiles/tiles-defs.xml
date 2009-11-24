@@ -137,9 +137,6 @@
 	
 	
 	
-	<definition name=".view.blog.home" extends=".masterLayout">
-		<put-attribute name="title" value="Home"/>
-		<put-attribute name="body" value="/WEB-INF/jsps/blog/viewHome.jsp" />
-	</definition>
+	<definition name=".view.blog.home" template="/WEB-INF/jsps/blog/viewHome.jsp" />
 
 </tiles-definitions>

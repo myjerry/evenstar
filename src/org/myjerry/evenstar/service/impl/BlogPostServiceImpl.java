@@ -44,10 +44,10 @@ public class BlogPostServiceImpl implements BlogPostService {
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
-			return false;
 		} finally {
 			manager.close();
 		}
+		return false;
 	}
 
 	@Override
@@ -70,17 +70,17 @@ public class BlogPostServiceImpl implements BlogPostService {
 
 	@Override
 	public boolean saveDraftPost(BlogPost blogPost) {
-		if(blogPost.getCreationDate() == null) {
-			blogPost.setCreationDate(ServerUtils.getServerDate());
-		}
-		blogPost.setLastUpdated(ServerUtils.getServerDate());
-		blogPost.setLastUpdateUser(GAEUserUtil.getUserID());
-		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		
 		try {
 			if(blogPost.getPostID() == null) {
 				// create a new post
+				if(blogPost.getCreationDate() == null) {
+					blogPost.setCreationDate(ServerUtils.getServerDate());
+				}
+				blogPost.setLastUpdated(ServerUtils.getServerDate());
+				blogPost.setLastUpdateUser(GAEUserUtil.getUserID());
+				
 				manager.makePersistent(blogPost);
 			} else {
 				// this post should be updated
@@ -98,10 +98,10 @@ public class BlogPostServiceImpl implements BlogPostService {
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
-			return false;
 		} finally {
 			manager.close();
 		}
+		return false;
 	}
 
 	@Override

@@ -17,7 +17,7 @@
 				<prop key="/admin/setDefaultBlog.html">defaultBlogController</prop>
 				
 				<prop key="/admin/settings.html">urlTilenameController</prop>
-				<prop key="/admin/layout.html">urlTilenameController</prop>
+				<prop key="/admin/layout.html">layoutController</prop>
 				 
 				<prop key="/startBlogging.html">urlTilenameController</prop>
 				

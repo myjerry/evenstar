@@ -19,4 +19,5 @@ public interface BlogService {
 	public Long getDefaultBlogID();
 
 	public boolean setDefaultBlogID(Long blogID);
+	
 }
