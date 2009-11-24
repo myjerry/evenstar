@@ -18,7 +18,7 @@ public class AdminController extends MultiActionController {
 	
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView mav = new ModelAndView();
-
+		
 		Collection<Blog> blogs = this.blogService.getAllBlogs();
 		Long defaultBlogID = this.blogService.getDefaultBlogID();
 		if(defaultBlogID != null) {

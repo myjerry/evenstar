@@ -84,7 +84,16 @@ public class BlogPostServiceImpl implements BlogPostService {
 				manager.makePersistent(blogPost);
 			} else {
 				// this post should be updated
+				Key key = KeyFactory.createKey(BlogPost.class.getSimpleName(), blogPost.getPostID()); 
+				BlogPost post = manager.getObjectById(BlogPost.class, key);
+				// overwrite this post object
+				post.setContents(blogPost.getContents());
+				post.setLabels(blogPost.getLabels());
+				post.setLastUpdated(ServerUtils.getServerDate());
+				post.setLastUpdateUser(GAEUserUtil.getUserID());
+				post.setTitle(blogPost.getTitle());
 				
+				manager.makePersistent(post);
 			}
 			return true;
 		} catch(Exception e) {
@@ -146,7 +155,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 	public Collection<BlogPost> getBlogPosts(Long blogID, int count) {
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		Query query = manager.newQuery(BlogPost.class);
-	    query.setFilter("blogID == blogIDParam");
+	    query.setFilter("blogID == blogIDParam && postedDate != null");
 	    query.setOrdering("postedDate desc");
 	    query.declareParameters("String blogIDParam");
 	    query.setRange(0, count + 1);

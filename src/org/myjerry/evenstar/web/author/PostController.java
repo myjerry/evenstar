@@ -42,8 +42,36 @@ public class PostController extends MultiActionController {
 	}
 
 	public ModelAndView saveAsDraft(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		List<String> validationErrors = validateRequest(request);
+
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName(".author.newpost");
+		if(validationErrors.size() == 0) {
+			BlogPost post = new BlogPost();
+			
+			String postID = request.getParameter("postID");
+			if(StringUtils.isNotEmpty(postID)) {
+				post.setPostID(new Long(postID));
+			}
+			String blogID = request.getParameter("blogID");
+			post.setBlogID(new Long(blogID));
+			post.setTitle(request.getParameter("postTitle"));
+			post.setContents(request.getParameter("postContents"));
+			String labels = request.getParameter("labels");
+			if(StringUtils.isEmpty(labels)) {
+				post.setLabels("");
+			} else {
+				post.setLabels(labels);
+			}
+			
+			boolean result = this.blogPostService.saveDraftPost(post);
+			if(!result) {
+				mav.addObject("errorString", "Unable to save the post to draft mode");
+			}
+			mav.addObject("post", post);
+			mav.addObject("blogID", blogID);
+			mav.addObject("postID", postID);
+		}
+		mav.setViewName(".author.newpost");	
 		return mav;
 	}
 	

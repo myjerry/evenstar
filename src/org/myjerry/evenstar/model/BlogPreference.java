@@ -2,18 +2,24 @@ package org.myjerry.evenstar.model;
 
 import java.util.Date;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import com.google.appengine.api.datastore.KeyFactory;
-
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
-public class Preference {
+public class BlogPreference {
 
 	@PrimaryKey
-	private String keyName;
+	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+	private Long preferenceID;
+	
+	@Persistent
+	private String key;
+	
+	@Persistent
+	private Long blogID;
 	
 	@Persistent
 	private String value;
@@ -25,17 +31,45 @@ public class Preference {
 	private Date lastUpdateTime;
 
 	/**
-	 * @return the key
+	 * @return the preferenceID
 	 */
-	public String getKey() {
-		return KeyFactory.stringToKey(keyName).getName();
+	public Long getPreferenceID() {
+		return preferenceID;
 	}
 
 	/**
-	 * @param key the key to set
+	 * @param preferenceID the preferenceID to set
+	 */
+	public void setPreferenceID(Long preferenceID) {
+		this.preferenceID = preferenceID;
+	}
+
+	/**
+	 * @return the keyName
+	 */
+	public String getKey() {
+		return key;
+	}
+
+	/**
+	 * @param keyName the keyName to set
 	 */
 	public void setKey(String key) {
-		this.keyName = key;
+		this.key = key;
+	}
+
+	/**
+	 * @return the blogID
+	 */
+	public Long getBlogID() {
+		return blogID;
+	}
+
+	/**
+	 * @param blogID the blogID to set
+	 */
+	public void setBlogID(Long blogID) {
+		this.blogID = blogID;
 	}
 
 	/**
@@ -79,5 +113,6 @@ public class Preference {
 	public void setLastUpdateTime(Date lastUpdateTime) {
 		this.lastUpdateTime = lastUpdateTime;
 	}
+
 
 }
