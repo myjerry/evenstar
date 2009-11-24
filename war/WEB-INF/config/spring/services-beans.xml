@@ -20,5 +20,11 @@
 	<bean name="feedService" class="org.myjerry.evenstar.service.impl.FeedServiceImpl" />
 	
 	<bean name="blogEmalService" class="org.myjerry.evenstar.service.impl.BlogEmailServiceImpl" />
+
+	<bean name="blogLayoutService" class="org.myjerry.evenstar.service.impl.BlogLayoutServiceImpl" />
 	
+	<bean name="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean" >
+		<property name="preferFileSystemAccess" value="false" />
+	</bean>	
+
 </beans>
