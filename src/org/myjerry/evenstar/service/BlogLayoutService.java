@@ -6,4 +6,6 @@ public interface BlogLayoutService {
 	
 	public boolean saveBlogTemplate(Long blogID, String template);
 	
+	public String getDefaultBlogTemplate();
+	
 }

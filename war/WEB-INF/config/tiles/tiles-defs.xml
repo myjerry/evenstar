@@ -135,8 +135,17 @@
 		<put-attribute name="body" value="/WEB-INF/jsps/settings/tools.jsp" />
 	</definition>
 	
-	
+	<definition name=".my.account" extends=".masterLayout">
+		<put-attribute name="title" value="My Account" />
+		<put-attribute name="body" value="/WEB-INF/jsps/user/myAccount.jsp" />
+	</definition>
 	
 	<definition name=".view.blog.home" template="/WEB-INF/jsps/blog/viewHome.jsp" />
+	
+	<definition name=".post.comments" template="/WEB-INF/jsps/blog/postComment.jsp" />
+	
+	<definition name=".reply.comment" template="/WEB-INF/jsps/blog/replyComment.jsp" />
+	
+	<definition name=".delete.comment" template="/WEB-INF/jsps/blog/deleteComment.jsp" />
 
 </tiles-definitions>

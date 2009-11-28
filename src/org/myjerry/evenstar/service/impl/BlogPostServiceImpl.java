@@ -3,6 +3,7 @@ package org.myjerry.evenstar.service.impl;
 import java.util.Collection;
 import java.util.List;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -11,6 +12,8 @@ import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
 import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
+import org.myjerry.util.StringUtils;
+import org.myjerry.util.WebUtils;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -30,6 +33,14 @@ public class BlogPostServiceImpl implements BlogPostService {
 		blogPost.setLastUpdated(ServerUtils.getServerDate());
 		blogPost.setLastUpdateUser(GAEUserUtil.getUserID());
 		blogPost.setPostedDate(ServerUtils.getServerDate());
+
+		if(StringUtils.isEmpty(blogPost.getUrl())) {
+			// this also means that we need to create a new URL for this service
+			int year = blogPost.getPostedDate().getYear() + 1900;
+			int month = blogPost.getPostedDate().getMonth();
+			String url = "/" + year + "/" + month + "/" + WebUtils.getUrlStringFromPostTitle(blogPost.getTitle());
+			blogPost.setUrl(url);
+		}
 		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		
@@ -39,7 +50,16 @@ public class BlogPostServiceImpl implements BlogPostService {
 				manager.makePersistent(blogPost);
 			} else {
 				// this post should be updated
-				
+				Key key = KeyFactory.createKey(BlogPost.class.getSimpleName(), blogPost.getPostID());
+				BlogPost post = manager.getObjectById(BlogPost.class, key);
+				post.setContents(blogPost.getContents());
+				post.setLabels(blogPost.getLabels());
+				post.setTitle(blogPost.getTitle());
+				post.setUrl(blogPost.getUrl());
+				post.setLastUpdated(blogPost.getLastUpdated());
+				post.setLastUpdateUser(blogPost.getLastUpdateUser());
+				post.setPostedDate(blogPost.getPostedDate());
+				manager.makePersistent(post);
 			}
 			return true;
 		} catch(Exception e) {
@@ -60,12 +80,12 @@ public class BlogPostServiceImpl implements BlogPostService {
 				manager.deletePersistent(post);
 				return true;
 			}
-			return false;
 		} catch(Exception e) {
-			return false;
+			e.printStackTrace();
 		} finally {
 			manager.close();
 		}
+		return false;
 	}
 
 	@Override
@@ -210,4 +230,42 @@ public class BlogPostServiceImpl implements BlogPostService {
 		}
 		return null;
 	}
+
+	@Override
+	public boolean existsPost(Long postID, Long blogID) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Key key = KeyFactory.createKey(BlogPost.class.getSimpleName(), postID); 
+			BlogPost post = manager.getObjectById(BlogPost.class, key);
+			if(post.getBlogID().equals(blogID)) {
+				return true;
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
+		return false;	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public BlogPost getPostForURI(String uri) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(BlogPost.class, "url == urlParam");
+		query.declareParameters("String urlParam");
+		try {
+			List<BlogPost> posts = (List<BlogPost>) query.execute(uri);
+			if(posts != null && posts.size() == 1) {
+				return manager.detachCopy(posts.get(0));
+			}
+		} catch(JDOObjectNotFoundException e) {
+			// do nothing
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
+		return null;
+	}
+
 }

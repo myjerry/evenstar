@@ -3,22 +3,6 @@
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c"%>
 <%@ page isELIgnored="false" %>
 
-<html>
-	<head>
-		<title>Home</title>
-	</head>
-	<body>
-This is the blog home page.
-<c:if test="${not empty posts}">
-	<c:forEach items="${posts}" var="post">
-		<h1>${post.title}</h1>
-		<p>${post.contents}</p>
-		<hr />
-	</c:forEach>
-</c:if>
-	</body>
-</html>
-
 <c:if test="${not empty generatedBlogPage}">
 ${generatedBlogPage}
 </c:if>

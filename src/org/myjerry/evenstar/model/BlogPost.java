@@ -33,6 +33,9 @@ public class BlogPost {
 	private Date creationDate;
 	
 	@Persistent
+	private String url;
+	
+	@Persistent
 	private Date postedDate;
 
 	@Persistent
@@ -168,6 +171,20 @@ public class BlogPost {
 	 */
 	public void setLabels(String labels) {
 		this.labels = labels;
+	}
+
+	/**
+	 * @return the url
+	 */
+	public String getUrl() {
+		return url;
+	}
+
+	/**
+	 * @param url the url to set
+	 */
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 }

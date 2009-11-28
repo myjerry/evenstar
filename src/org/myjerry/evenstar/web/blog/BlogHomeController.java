@@ -1,6 +1,7 @@
 package org.myjerry.evenstar.web.blog;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,10 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.myjerry.evenstar.model.Blog;
 import org.myjerry.evenstar.model.BlogPost;
 import org.myjerry.evenstar.service.BlogLayoutService;
 import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.evenstar.service.BlogService;
+import org.myjerry.evenstar.service.CommentService;
+import org.myjerry.evenstar.view.BlogInfo;
+import org.myjerry.evenstar.view.BlogPostInfo;
 import org.myjerry.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
@@ -28,6 +33,9 @@ public class BlogHomeController extends MultiActionController {
 	private BlogPostService blogPostService;
 	
 	@Autowired
+	private CommentService commentService;
+	
+	@Autowired
 	private VelocityEngine velocityEngine;
 	
 	@Autowired
@@ -39,18 +47,27 @@ public class BlogHomeController extends MultiActionController {
 		if(defaultBlogID == null) {
 			mav.setViewName(".evenstar");
 		} else {
+			Blog blog = this.blogService.getBlog(defaultBlogID);
 			Collection<BlogPost> posts = this.blogPostService.getBlogPosts(defaultBlogID, 10);
+			Collection<BlogPostInfo> list = new ArrayList<BlogPostInfo>();
+			if(posts != null) {
+				for(BlogPost post : posts) {
+					BlogPostInfo p = new BlogPostInfo(post);
+					p.setNumComments(this.commentService.getTotalCommentsOnPost(p.getId(), defaultBlogID));
+					list.add(p);
+				}
+			}
+			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("blog", new BlogInfo(blog));
+			model.put("title", blog.getTitle());
+			model.put("description", blog.getDescription());
+			model.put("posts", list);
 			
 			String template = this.blogLayoutService.getBlogTemplate(defaultBlogID);
 			if(StringUtils.isEmpty(template)) {
-				// error, but we can't do anything here
+				template = this.blogLayoutService.getDefaultBlogTemplate();
 			}
-			template = "#foreach ($post in $posts) $post.title <br /> #end";
-			
-			Map<String, Object> model = new HashMap<String, Object>();
-			
-			model.put("posts", posts);
-			
+
 			StringWriter result = new StringWriter();
 			this.velocityEngine.evaluate(new VelocityContext(model), result, "log string", template);
 			String generatedBlogPage = result.toString();
@@ -116,5 +133,19 @@ public class BlogHomeController extends MultiActionController {
 	 */
 	public void setBlogLayoutService(BlogLayoutService blogLayoutService) {
 		this.blogLayoutService = blogLayoutService;
+	}
+
+	/**
+	 * @return the commentService
+	 */
+	public CommentService getCommentService() {
+		return commentService;
+	}
+
+	/**
+	 * @param commentService the commentService to set
+	 */
+	public void setCommentService(CommentService commentService) {
+		this.commentService = commentService;
 	}
 }

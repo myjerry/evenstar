@@ -9,6 +9,7 @@
 		<property name="mappings">
 			<props>
 				<prop key="/index.html">blogHomeController</prop>
+				<prop key="/viewPost.html">viewPostController</prop>
 				
 				<prop key="/noAccess.html">urlTilenameController</prop>
 				
@@ -35,8 +36,14 @@
 				<prop key="/admin/settings/security.html">urlTilenameController</prop>
 				<prop key="/admin/settings/tools.html">urlTilenameController</prop>
 				
+				<prop key="/postComment.html">postCommentController</prop>
+				<prop key="/replyComment.html">replyCommentController</prop>
+				<prop key="/deleteComment.html">deleteCommentController</prop>
+				
+				<prop key="/myAccount.html">userAccountController</prop>
+				
 				<!-- For all other URIs that do not match, forward the user to a generic Page Not Found page. -->
-        		<prop key="/*.*">pageNotFoundController</prop>
+        		<prop key="/**">pageNotFoundController</prop>
 			</props>
 		</property>
 	</bean>

@@ -1,5 +1,7 @@
 package org.myjerry.evenstar.service.impl;
 
+import java.io.IOException;
+
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -8,12 +10,18 @@ import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
 import org.myjerry.evenstar.service.BlogLayoutService;
 import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
+import org.myjerry.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
 
 public class BlogLayoutServiceImpl implements BlogLayoutService {
+
+	@Autowired
+	private Resource defaultTemplate; 
 
 	@Override
 	public String getBlogTemplate(Long blogID) {
@@ -58,6 +66,31 @@ public class BlogLayoutServiceImpl implements BlogLayoutService {
 			manager.close();
 		}
 		return false;
+	}
+
+	@Override
+	public String getDefaultBlogTemplate() {
+		try {
+			return StringUtils.getString(this.defaultTemplate.getInputStream());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * @return the defaultTemplate
+	 */
+	public Resource getDefaultTemplate() {
+		return defaultTemplate;
+	}
+
+	/**
+	 * @param defaultTemplate the defaultTemplate to set
+	 */
+	public void setDefaultTemplate(Resource defaultTemplate) {
+		this.defaultTemplate = defaultTemplate;
 	}
 
 }

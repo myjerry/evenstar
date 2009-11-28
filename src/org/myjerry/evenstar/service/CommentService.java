@@ -14,9 +14,14 @@ public interface CommentService {
 	
 	public Comment getComment(Long commentID, Long postID, Long blogID);
 	
-	public Collection<Comment> getCommentsForPost(Long postID, Long blogID);
+	public Collection<Comment> getCommentsForPost(Long postID, Long blogID, int count);
 
 	public Collection<Comment> getAllUnpublishedComments();
 	
 	public Collection<Comment> getUnpublishedCommentsForPost(Long postID, Long blogID);
+	
+	public boolean postHasComment(Long commentID, Long postID, Long blogID);
+	
+	public int getTotalCommentsOnPost(Long postID, Long blogID);
+	
 }

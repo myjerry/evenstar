@@ -18,7 +18,7 @@ public class Comment {
 	private Long commentID;
 	
 	@Persistent
-	private Long blogPostID;
+	private Long postID;
 	
 	@Persistent
 	private Long blogID;
@@ -27,59 +27,59 @@ public class Comment {
 	private Text content;
 	
 	@Persistent
-	private long authorID;
+	private Long authorID;
 	
 	@Persistent
 	private Date timestamp;
 	
 	@Persistent
-	private int permissions;
+	private Integer permissions;
 	
 	@Persistent
-	private boolean deleted;
+	private Boolean deleted;
 	
 	@Persistent
-	private long parentID;
+	private Long parentID;
 
 	/**
 	 * @return the commentID
 	 */
-	public long getCommentID() {
+	public Long getCommentID() {
 		return commentID;
 	}
 
 	/**
 	 * @param commentID the commentID to set
 	 */
-	public void setCommentID(long commentID) {
+	public void setCommentID(Long commentID) {
 		this.commentID = commentID;
 	}
 
 	/**
-	 * @return the blogPostID
+	 * @return the postID
 	 */
-	public long getBlogPostID() {
-		return blogPostID;
+	public Long getPostID() {
+		return postID;
 	}
 
 	/**
-	 * @param blogPostID the blogPostID to set
+	 * @param postID the postID to set
 	 */
-	public void setBlogPostID(long blogPostID) {
-		this.blogPostID = blogPostID;
+	public void setPostID(Long postID) {
+		this.postID = postID;
 	}
 
 	/**
 	 * @return the blogID
 	 */
-	public long getBlogID() {
+	public Long getBlogID() {
 		return blogID;
 	}
 
 	/**
 	 * @param blogID the blogID to set
 	 */
-	public void setBlogID(long blogID) {
+	public void setBlogID(Long blogID) {
 		this.blogID = blogID;
 	}
 
@@ -87,7 +87,10 @@ public class Comment {
 	 * @return the content
 	 */
 	public String getContent() {
-		return content.getValue();
+		if(this.content != null) {
+			return this.content.getValue();
+		}
+		return null;
 	}
 
 	/**
@@ -100,14 +103,14 @@ public class Comment {
 	/**
 	 * @return the authorID
 	 */
-	public long getAuthorID() {
+	public Long getAuthorID() {
 		return authorID;
 	}
 
 	/**
 	 * @param authorID the authorID to set
 	 */
-	public void setAuthorID(long authorID) {
+	public void setAuthorID(Long authorID) {
 		this.authorID = authorID;
 	}
 
@@ -128,43 +131,43 @@ public class Comment {
 	/**
 	 * @return the permissions
 	 */
-	public int getPermissions() {
+	public Integer getPermissions() {
 		return permissions;
 	}
 
 	/**
 	 * @param permissions the permissions to set
 	 */
-	public void setPermissions(int permissions) {
+	public void setPermissions(Integer permissions) {
 		this.permissions = permissions;
 	}
 
 	/**
 	 * @return the deleted
 	 */
-	public boolean isDeleted() {
+	public Boolean getDeleted() {
 		return deleted;
 	}
 
 	/**
 	 * @param deleted the deleted to set
 	 */
-	public void setDeleted(boolean deleted) {
+	public void setDeleted(Boolean deleted) {
 		this.deleted = deleted;
 	}
 
 	/**
 	 * @return the parentID
 	 */
-	public long getParentID() {
+	public Long getParentID() {
 		return parentID;
 	}
 
 	/**
 	 * @param parentID the parentID to set
 	 */
-	public void setParentID(long parentID) {
+	public void setParentID(Long parentID) {
 		this.parentID = parentID;
 	}
-	
+
 }

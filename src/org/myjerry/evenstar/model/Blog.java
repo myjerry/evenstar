@@ -8,6 +8,8 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import com.google.appengine.api.datastore.Text;
+
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class Blog {
 	
@@ -17,6 +19,9 @@ public class Blog {
 	
 	@Persistent
 	private String title;
+	
+	@Persistent
+	private Text description;
 	
 	@Persistent
 	private String address;
@@ -95,6 +100,23 @@ public class Blog {
 	 */
 	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		if(this.description != null) {
+			return this.description.getValue();
+		}
+		return null;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = new Text(description);
 	}
 
 }

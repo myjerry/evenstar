@@ -24,9 +24,10 @@
 		%>
 			<a href="<%=userService.createLoginURL(thisURL) %>">Sign In</a>
 		<% } else { %>
+			<a href="/myAccount.html">My Account</a>
 			<a href="<%=userService.createLogoutURL(thisURL) %>">Sign Out</a>
 		<% } %>
-		
+		<hr />
 		<br />
 		<br />
 		<br />

@@ -1,0 +1,37 @@
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+	<head>
+		<title>$blog.title</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="generator" content="Evenstar 0.2" />
+	</head>
+	<body>
+		<a href="/index.html">Home</a>
+		<a href="/admin.html">Admin</a>
+		<a href="/_ah/admin" target="_blank">Local Datastore</a>
+		<hr />
+		
+        <div id="wrapper">
+        	<div id="" >
+			#foreach ($post in $posts)
+			<div class="post">
+				<div class="postMeta">
+					$post.numComments comments
+					<a href="$post.addCommentUrl">Post Comment</a> 
+					<span class="date">$post.timestamp</span> 
+				</div>
+				<h2><a href="$post.url" title="$post.title">$post.title</a></h2> 
+				<div class="entry">
+					$post.body
+				</div>
+				<div class="postMeta">
+					<a href="$post.emailPostUrl">Email this post</a>
+					<a href="$post.editUrl">Edit Post</a>
+				</div>
+				<br />
+				<br />
+				<br /> 
+			#end
+        </div>
+            
+	</body>
+</html>

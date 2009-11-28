@@ -3,6 +3,7 @@ package org.myjerry.evenstar.service.impl;
 import java.util.Collection;
 import java.util.List;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -15,6 +16,9 @@ import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
 import org.myjerry.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 public class BlogServiceImpl implements BlogService {
 	
@@ -121,6 +125,25 @@ public class BlogServiceImpl implements BlogService {
 	 */
 	public void setPreferenceService(PreferenceService preferenceService) {
 		this.preferenceService = preferenceService;
+	}
+
+	@Override
+	public Blog getBlog(Long blogID) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Key key = KeyFactory.createKey(Blog.class.getSimpleName(), blogID);
+			Blog blog = manager.getObjectById(Blog.class, key);
+			// hack for GAE to fetch text fields
+			blog.getDescription();
+			return manager.detachCopy(blog);
+		} catch(JDOObjectNotFoundException e) {
+			// do nothing
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
+		return null;
 	}
 
 }

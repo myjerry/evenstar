@@ -5,7 +5,9 @@
 
 <beans>
 
-	<bean name="pageNotFoundController" class="org.myjerry.evenstar.web.controller.PageNotFoundController" />
+	<bean name="pageNotFoundController" class="org.myjerry.evenstar.web.controller.PageNotFoundController" >
+		<property name="blogPostService" ref="blogPostService" />
+	</bean>
 	
 	<bean name="adminController" class="org.myjerry.evenstar.web.admin.AdminController" >
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
@@ -48,11 +50,40 @@
 		<property name="blogService" ref="blogService" />
 		<property name="blogLayoutService" ref="blogLayoutService" />
 		<property name="velocityEngine" ref="velocityEngine" />
+		<property name="commentService" ref="commentService" />
 	</bean>
 	
 	<bean name="layoutController" class="org.myjerry.evenstar.web.layout.LayoutController">
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
 		<property name="blogLayoutService" ref="blogLayoutService" />
+	</bean>
+	
+	<bean name="postCommentController" class="org.myjerry.evenstar.web.blog.PostCommentController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="commentService" ref="commentService" />
+	</bean>
+	
+	<bean name="replyCommentController" class="org.myjerry.evenstar.web.blog.ReplyCommentController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="commentService" ref="commentService" />
+	</bean>
+	
+	<bean name="deleteCommentController" class="org.myjerry.evenstar.web.blog.DeleteCommentController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="commentService" ref="commentService" />
+	</bean>
+	
+	<bean name="userAccountController" class="org.myjerry.evenstar.web.user.UserAccountController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	<bean name="viewPostController" class="org.myjerry.evenstar.web.blog.ViewPostController" >
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPostService" ref="blogPostService" />
+		<property name="blogLayoutService" ref="blogLayoutService" />
+		<property name="velocityEngine" ref="velocityEngine" />
+		<property name="commentService" ref="commentService" />
 	</bean>
 
 </beans>
