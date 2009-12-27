@@ -36,6 +36,7 @@ public class CreateBlogController extends MultiActionController {
 		// check for requisite parameters
 		String blogTitle = request.getParameter("blogTitle");
 		String blogAddress = request.getParameter("blogAddress");
+		String blogAlias = request.getParameter("blogAlias");
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName(".admin.create.blog");
@@ -48,10 +49,13 @@ public class CreateBlogController extends MultiActionController {
 			if(this.blogService.existsBlogAddress(blogAddress)) {
 				validationErrors.add("A blog with the same address already exists.");
 			}
+			if(this.blogService.existsBlogAlias(blogAlias)) {
+				validationErrors.add("A blog with the same alias already exists.");
+			}
 
 			if(validationErrors.size() == 0) {
 				try {
-					boolean result = this.blogService.createBlog(blogTitle, blogAddress);
+					boolean result = this.blogService.createBlog(blogTitle, blogAddress, blogAlias);
 					if(!result) {
 						validationErrors.add("Error creating blog");
 					} else {

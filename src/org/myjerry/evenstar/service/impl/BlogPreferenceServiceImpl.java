@@ -111,21 +111,28 @@ public class BlogPreferenceServiceImpl implements BlogPreferenceService {
 			Query q = manager.newQuery(BlogPreference.class, "blogID == blogIDParam && key == keyParam");
 			q.declareParameters("Long blogIDParam, String keyParam");
 			List<BlogPreference> preferences = (List<BlogPreference>) q.execute(blogID, key);
-			if(preferences != null && preferences.size() == 1) {
-				pref = preferences.get(0);
-				pref.setValue(value);
-				pref.setLastUpdateUser(GAEUserUtil.getUserID());
-				pref.setLastUpdateTime(ServerUtils.getServerDate());
-			} else {
-				pref = new BlogPreference();
-				pref.setBlogID(blogID);
-				pref.setKey(key);
-				pref.setValue(value);
-				pref.setLastUpdateUser(GAEUserUtil.getUserID());
-				pref.setLastUpdateTime(ServerUtils.getServerDate());
-				manager.makePersistent(pref);
+			if(preferences != null) {
+				if(preferences.size() == 1) {
+					pref = preferences.get(0);
+					pref.setValue(value);
+					pref.setLastUpdateUser(GAEUserUtil.getUserID());
+					pref.setLastUpdateTime(ServerUtils.getServerDate());
+					manager.makePersistent(pref);
+					return true;
+				} else if(preferences.size() == 0) {
+					pref = new BlogPreference();
+					pref.setBlogID(blogID);
+					pref.setKey(key);
+					pref.setValue(value);
+					pref.setLastUpdateUser(GAEUserUtil.getUserID());
+					pref.setLastUpdateTime(ServerUtils.getServerDate());
+					manager.makePersistent(pref);
+					return true;
+				} else {
+					// this cannot be - two preferences with same ID
+					// just can't be
+				}
 			}
-			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {

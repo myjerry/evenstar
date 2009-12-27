@@ -1,5 +1,6 @@
 package org.myjerry.evenstar.view;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.myjerry.evenstar.model.BlogPost;
@@ -41,16 +42,21 @@ public class BlogPostInfo {
 	private List<FeedLinkInfo> feedLinks;
 	
 	private List<CommentInfo> comments;
+	
+	private boolean restricted;
 
-	public BlogPostInfo(BlogPost post) {
+	public BlogPostInfo(BlogPost post, String dateHeaderFormat) {
 		this.id = post.getPostID();
 		this.title = post.getTitle();
 		this.body = post.getContents();
 		this.author = post.getLastUpdateUser();
 		this.blogID = post.getBlogID();
-		this.timestamp = post.getPostedDate().toString();
+		
+		SimpleDateFormat formatter = new SimpleDateFormat(dateHeaderFormat);
+		this.timestamp = formatter.format(post.getPostedDate());
+		
 		this.addCommentUrl = "/postComment.html?postID=" + this.id + "&blogID=" + this.blogID;
-		this.editUrl = "/post.html?postID=" + this.id + "&blogID=" + this.blogID;
+		this.editUrl = "/author/post.html?postID=" + this.id + "&blogID=" + this.blogID;
 		this.url = post.getUrl();
 		this.emailPostUrl = "/emailPost.html?postID=" + this.id + "&blogID=" + this.blogID;
 	}
@@ -298,6 +304,20 @@ public class BlogPostInfo {
 	 */
 	public void setBlogID(Long blogID) {
 		this.blogID = blogID;
+	}
+
+	/**
+	 * @return the restricted
+	 */
+	public boolean isRestricted() {
+		return restricted;
+	}
+
+	/**
+	 * @param restricted the restricted to set
+	 */
+	public void setRestricted(boolean restricted) {
+		this.restricted = restricted;
 	}
 	
 }

@@ -12,6 +12,10 @@ import com.google.appengine.api.datastore.Text;
 
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class Comment {
+	
+	public static final int PRIVACY_MODE_PUBLIC = 1;
+	
+	public static final int PRIVACY_MODE_PRIVATE = 2;
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -40,6 +44,9 @@ public class Comment {
 	
 	@Persistent
 	private Long parentID;
+	
+	@Persistent
+	private Boolean published;
 
 	/**
 	 * @return the commentID
@@ -168,6 +175,20 @@ public class Comment {
 	 */
 	public void setParentID(Long parentID) {
 		this.parentID = parentID;
+	}
+
+	/**
+	 * @return the published
+	 */
+	public Boolean getPublished() {
+		return published;
+	}
+
+	/**
+	 * @param published the published to set
+	 */
+	public void setPublished(Boolean published) {
+		this.published = published;
 	}
 
 }

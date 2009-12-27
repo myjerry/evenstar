@@ -7,9 +7,12 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.myjerry.evenstar.model.AutoApprovedCommentor;
+import org.myjerry.evenstar.model.BannedCommentor;
 import org.myjerry.evenstar.model.Comment;
 import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
 import org.myjerry.evenstar.service.CommentService;
+import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
 
 import com.google.appengine.api.datastore.DatastoreService;
@@ -173,6 +176,204 @@ public class CommentServiceImpl implements CommentService {
 		int size = preparedQuery.asList(fetchOptions).size();
 		
 		return size;
+	}
+
+	@Override
+	public boolean addAutoApproveCommentor(String emailAddress, Long blogID) {
+		if(!existsAutoApproveCommentor(emailAddress, blogID)) {
+			AutoApprovedCommentor commentor = new AutoApprovedCommentor();
+			commentor.setBlogID(blogID);
+			commentor.setEmailAddress(emailAddress);
+			commentor.setLastUpdatedOn(ServerUtils.getServerDate());
+			commentor.setLastUpdatedBy(GAEUserUtil.getUserID());
+			
+			PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+			try {
+				manager.makePersistent(commentor);
+				
+				return true;
+			} catch(Exception e) {
+				e.printStackTrace();
+				return false;
+			} finally {
+				manager.close();
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean addAutoRejectCommentor(String emailAddress, Long blogID) {
+		if(!existsAutoRejectCommentor(emailAddress, blogID)) {
+			BannedCommentor commentor = new BannedCommentor();
+			commentor.setBlogID(blogID);
+			commentor.setEmailAddress(emailAddress);
+			commentor.setLastUpdatedOn(ServerUtils.getServerDate());
+			commentor.setLastUpdatedBy(GAEUserUtil.getUserID());
+			
+			PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+			try {
+				manager.makePersistent(commentor);
+				
+				return true;
+			} catch(Exception e) {
+				e.printStackTrace();
+				return false;
+			} finally {
+				manager.close();
+			}
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean deleteAutoApproveCommentor(String emailAddress, Long blogID) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(AutoApprovedCommentor.class);
+	    query.setFilter("emailAddress == emailAddressParam && blogID == blogIDParam");
+	    query.declareParameters("String emailAddressParam, String blogIDParam");
+	    
+	    try {
+	    	List<AutoApprovedCommentor> commentors = (List<AutoApprovedCommentor>) query.execute(emailAddress, blogID);
+	    	if(commentors != null && commentors.size() > 0) {
+	    		for(AutoApprovedCommentor commentor : commentors) {
+	    			manager.deletePersistent(commentor);
+	    		}
+	    	}
+	    	return true;
+	    } catch(JDOObjectNotFoundException e) {
+	    	// do nothing
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean deleteAutoRejectCommentor(String emailAddress, Long blogID) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(BannedCommentor.class);
+	    query.setFilter("emailAddress == emailAddressParam && blogID == blogIDParam");
+	    query.declareParameters("String emailAddressParam, String blogIDParam");
+	    
+	    try {
+	    	List<BannedCommentor> commentors = (List<BannedCommentor>) query.execute(emailAddress, blogID);
+	    	if(commentors != null && commentors.size() > 0) {
+	    		for(BannedCommentor commentor : commentors) {
+	    			manager.deletePersistent(commentor);
+	    		}
+	    	}
+	    	return true;
+	    } catch(JDOObjectNotFoundException e) {
+	    	// do nothing
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean existsAutoApproveCommentor(String emailAddress, Long blogID) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(AutoApprovedCommentor.class);
+	    query.setFilter("emailAddress == emailAddressParam && blogID == blogIDParam");
+	    query.declareParameters("String emailAddressParam, String blogIDParam");
+	    
+	    try {
+	    	List<AutoApprovedCommentor> commentors = (List<AutoApprovedCommentor>) query.execute(emailAddress, blogID);
+	    	if(commentors != null && commentors.size() == 1) {
+	    		return true;
+	    	}
+	    } catch(JDOObjectNotFoundException e) {
+	    	// do nothing
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean existsAutoRejectCommentor(String emailAddress, Long blogID) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(BannedCommentor.class);
+	    query.setFilter("emailAddress == emailAddressParam && blogID == blogIDParam");
+	    query.declareParameters("String emailAddressParam, String blogIDParam");
+	    
+	    try {
+	    	List<BannedCommentor> commentors = (List<BannedCommentor>) query.execute(emailAddress, blogID);
+	    	if(commentors != null && commentors.size() == 1) {
+	    		return true;
+	    	}
+	    } catch(JDOObjectNotFoundException e) {
+	    	// do nothing
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<AutoApprovedCommentor> getAutoApproveCommentors(Long blogID) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(AutoApprovedCommentor.class);
+	    query.setFilter("blogID == blogIDParam");
+	    query.declareParameters("String blogIDParam");
+	    
+	    try {
+	    	List<AutoApprovedCommentor> commentors = (List<AutoApprovedCommentor>) query.execute(blogID);
+	    	if(commentors != null && commentors.size() > 0) {
+	    		return manager.detachCopyAll(commentors);
+	    	}
+	    } catch(JDOObjectNotFoundException e) {
+	    	// do nothing
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<BannedCommentor> getAutoRejectCommentors(Long blogID) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(BannedCommentor.class);
+	    query.setFilter("blogID == blogIDParam");
+	    query.declareParameters("String blogIDParam");
+	    
+	    try {
+	    	List<BannedCommentor> commentors = (List<BannedCommentor>) query.execute(blogID);
+	    	if(commentors != null && commentors.size() > 0) {
+	    		return manager.detachCopyAll(commentors);
+	    	}
+	    } catch(JDOObjectNotFoundException e) {
+	    	// do nothing
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
+		return null;
 	}
 
 }

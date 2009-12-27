@@ -42,12 +42,16 @@ public class ReplyCommentController extends MultiActionController {
 		String parentID = request.getParameter("parentID");
 		String thoughts = request.getParameter("thoughts");
 		
+		Comment parentComment = this.commentService.getComment(StringUtils.getLong(parentID), StringUtils.getLong(postID), StringUtils.getLong(blogID));
+
 		Comment comment = new Comment();
 		comment.setAuthorID(StringUtils.getLong(GAEUserUtil.getUserID()));
 		comment.setBlogID(StringUtils.getLong(blogID));
 		comment.setContent(thoughts);
 		comment.setPostID(StringUtils.getLong(postID));
 		comment.setParentID(StringUtils.getLong(parentID));
+		comment.setPermissions(parentComment.getPermissions());
+		
 		boolean result = this.commentService.postComment(comment);
 		if(!result) {
 			mav = view(request, response);

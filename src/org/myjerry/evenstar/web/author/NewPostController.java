@@ -3,6 +3,7 @@ package org.myjerry.evenstar.web.author;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.myjerry.evenstar.model.BlogPost;
 import org.springframework.web.servlet.ModelAndView;
 
 public class NewPostController extends PostController {
@@ -11,6 +12,7 @@ public class NewPostController extends PostController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName(".author.newpost");
 		mav.addObject("blogID", request.getParameter("blogID"));
+		mav.addObject("privacyMode", new Integer(BlogPost.PRIVACY_MODE_PUBLIC));
 		return mav;
 	}
 

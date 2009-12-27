@@ -26,11 +26,13 @@ public class BlogServiceImpl implements BlogService {
 	private PreferenceService preferenceService;
 	
 	@Override
-	public boolean createBlog(String blogName, String blogAddress) {
+	public boolean createBlog(String blogName, String blogAddress, String blogAlias) {
 		// TODO Auto-generated method stub
 		Blog blog = new Blog();
 		blog.setTitle(blogName);
 		blog.setAddress(blogAddress);
+		blog.setAlias(blogAlias);
+		
 		blog.setCreationDate(ServerUtils.getServerDate());
 		blog.setOwnerID(GAEUserUtil.getUserID());
 		
@@ -48,14 +50,34 @@ public class BlogServiceImpl implements BlogService {
 	}
 
 	@Override
-	public boolean deleteBlog(String blogName) {
-		// TODO Auto-generated method stub
+	public boolean deleteBlog(Long blogID) {
+		if(blogID == null) {
+			return false;
+		}
+		
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Key key = KeyFactory.createKey(Blog.class.getSimpleName(), blogID);
+			Blog blog = manager.getObjectById(Blog.class, key);
+			manager.deletePersistent(blog);
+			return true;
+		} catch(JDOObjectNotFoundException e) {
+			// do nothing
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
 		return false;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean existsBlogAddress(String blogAddress) {
+		if(StringUtils.isEmpty(blogAddress)) {
+			return false;
+		}
+		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		try {
 			Query query = manager.newQuery(Blog.class, "address == addressParam");
@@ -73,11 +95,55 @@ public class BlogServiceImpl implements BlogService {
 		}
 		return true;
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean existsBlogAlias(String alias) {
+		if(StringUtils.isEmpty(alias)) {
+			return false;
+		}
 
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Query query = manager.newQuery(Blog.class, "alias == aliasParam");
+			query.declareParameters("String aliasParam");
+			
+			List<Blog> blogs = (List<Blog>) query.execute(alias);
+			if(blogs != null && blogs.size() > 0) {
+				return true;
+			}
+			return false;
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
+		return true;
+	}
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean existsBlogName(String blogTitle) {
-		// TODO Auto-generated method stub
-		return false;
+		if(StringUtils.isEmpty(blogTitle)) {
+			return false;
+		}
+
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Query query = manager.newQuery(Blog.class, "title == titleParam");
+			query.declareParameters("String titleParam");
+			
+			List<Blog> blogs = (List<Blog>) query.execute(blogTitle);
+			if(blogs != null && blogs.size() > 0) {
+				return true;
+			}
+			return false;
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
+		return true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -129,6 +195,10 @@ public class BlogServiceImpl implements BlogService {
 
 	@Override
 	public Blog getBlog(Long blogID) {
+		if(blogID == null) {
+			return null;
+		}
+		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		try {
 			Key key = KeyFactory.createKey(Blog.class.getSimpleName(), blogID);
@@ -138,6 +208,60 @@ public class BlogServiceImpl implements BlogService {
 			return manager.detachCopy(blog);
 		} catch(JDOObjectNotFoundException e) {
 			// do nothing
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
+		return null;
+	}
+
+	@Override
+	public boolean updateBlog(Blog blog) {
+		if(blog == null) {
+			return false;
+		}
+		
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Key key = KeyFactory.createKey(Blog.class.getSimpleName(), blog.getBlogID());
+			Blog b = manager.getObjectById(Blog.class, key);
+
+			// hack for GAE to fetch text fields
+			b.setAddress(blog.getAddress());
+			b.setAlias(blog.getAlias());
+			b.setDescription(blog.getDescription());
+			b.setTitle(blog.getTitle());
+			b.setRestrictedPostText(blog.getRestrictedPostText());
+			
+			manager.makePersistent(b);
+			return true;
+		} catch(JDOObjectNotFoundException e) {
+			// do nothing
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Long getBlogIDForServerName(String serverName) {
+		if(StringUtils.isEmpty(serverName)) {
+			return null;
+		}
+		
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Query query = manager.newQuery(Blog.class, "address == addressParam");
+			query.declareParameters("String addressParam");
+			
+			List<Blog> blogs = (List<Blog>) query.execute(serverName);
+			if(blogs != null && blogs.size() > 0) {
+				return blogs.get(0).getBlogID();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {

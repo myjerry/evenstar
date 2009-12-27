@@ -1,9 +1,9 @@
 package org.myjerry.evenstar.service.impl;
 
 import org.myjerry.evenstar.model.EvenstarUser;
-import org.myjerry.evenstar.service.EvenstarUserService;
+import org.myjerry.evenstar.service.UserService;
 
-public class EvenstarUserServiceImpl implements EvenstarUserService {
+public class UserServiceImpl implements UserService {
 
 	@Override
 	public boolean addAdmin(String userGoogleID) {
@@ -31,12 +31,6 @@ public class EvenstarUserServiceImpl implements EvenstarUserService {
 
 	@Override
 	public boolean isUserAdmin(String userGoogleID) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isUserBlogAdmin(Long blogID) {
 		// TODO Auto-generated method stub
 		return false;
 	}

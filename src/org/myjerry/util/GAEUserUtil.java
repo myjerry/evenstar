@@ -39,7 +39,11 @@ public class GAEUserUtil {
 	}
 	
 	public static boolean isCurrentUserHost() {
-		return getUserService().isUserAdmin();
+		UserService service = getUserService();
+		if(service != null) {
+			return service.isUserLoggedIn() && service.isUserAdmin();
+		}
+		return false;
 	}
 
 }

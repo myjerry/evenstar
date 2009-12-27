@@ -32,7 +32,7 @@ public class EditPostsController extends MultiActionController {
 		Collection<BlogPost> posts = this.blogPostService.getAllBlogPosts(blogID);
 		
 		mav.setViewName(".author.editposts");
-		mav.addObject("blogID", String.valueOf(blogID));
+		mav.addObject("blogID", blogID);
 		mav.addObject("posts", posts);
 		mav.addObject("totalPosts", totalPosts);
 		

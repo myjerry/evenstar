@@ -1,19 +1,23 @@
 package org.myjerry.evenstar.service.impl;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.myjerry.evenstar.model.Blog;
 import org.myjerry.evenstar.model.BlogPost;
 import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
 import org.myjerry.evenstar.service.BlogPostService;
+import org.myjerry.evenstar.service.BlogService;
 import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
 import org.myjerry.util.StringUtils;
 import org.myjerry.util.WebUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -24,7 +28,10 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 
 public class BlogPostServiceImpl implements BlogPostService {
-
+	
+	@Autowired
+	private BlogService blogService;
+	
 	@Override
 	public boolean publishPost(BlogPost blogPost) {
 		if(blogPost.getCreationDate() == null) {
@@ -37,8 +44,14 @@ public class BlogPostServiceImpl implements BlogPostService {
 		if(StringUtils.isEmpty(blogPost.getUrl())) {
 			// this also means that we need to create a new URL for this service
 			int year = blogPost.getPostedDate().getYear() + 1900;
-			int month = blogPost.getPostedDate().getMonth();
+			int month = blogPost.getPostedDate().getMonth() + 1;
 			String url = "/" + year + "/" + month + "/" + WebUtils.getUrlStringFromPostTitle(blogPost.getTitle());
+			
+			Blog blog = this.blogService.getBlog(blogPost.getBlogID());
+			if(StringUtils.isNotEmpty(blog.getAlias())) {
+				url = "/" + blog.getAlias() + url;
+			}
+			
 			blogPost.setUrl(url);
 		}
 		
@@ -59,6 +72,8 @@ public class BlogPostServiceImpl implements BlogPostService {
 				post.setLastUpdated(blogPost.getLastUpdated());
 				post.setLastUpdateUser(blogPost.getLastUpdateUser());
 				post.setPostedDate(blogPost.getPostedDate());
+				post.setPrivacyMode(blogPost.getPrivacyMode());
+				
 				manager.makePersistent(post);
 			}
 			return true;
@@ -112,6 +127,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 				post.setLastUpdated(ServerUtils.getServerDate());
 				post.setLastUpdateUser(GAEUserUtil.getUserID());
 				post.setTitle(blogPost.getTitle());
+				post.setPrivacyMode(blogPost.getPrivacyMode());
 				
 				manager.makePersistent(post);
 			}
@@ -198,6 +214,66 @@ public class BlogPostServiceImpl implements BlogPostService {
 	    }
 		return null;
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<BlogPost> getOlderBlogPosts(Long blogID, int count, Date lastUpdated) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(BlogPost.class);
+	    query.setFilter("blogID == blogIDParam && postedDate != null && postedDate <= postedDateParam");
+	    query.setOrdering("postedDate desc");
+	    query.declareImports("import java.util.Date");
+	    query.declareParameters("String blogIDParam, Date postedDateParam");
+	    query.setRange(0, count + 1);
+	    
+	    try {
+	    	List<BlogPost> posts = (List<BlogPost>) query.execute(blogID, lastUpdated);
+	    	if(posts != null) {
+	    		// take care of a GAE Bug
+	    		for(BlogPost post : posts) {
+	    			post.getContents(); // trash this get :(
+	    		}
+	    		return manager.detachCopyAll(posts);
+	    	}
+	    	return posts;
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<BlogPost> getNewerBlogPosts(Long blogID, int count, Date lastUpdated) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(BlogPost.class);
+	    query.setFilter("blogID == blogIDParam && postedDate != null && postedDate >= postedDateParam");
+	    query.setOrdering("postedDate asc");
+	    query.declareImports("import java.util.Date");
+	    query.declareParameters("String blogIDParam, Date postedDateParam");
+	    query.setRange(0, count + 1);
+	    
+	    try {
+	    	List<BlogPost> posts = (List<BlogPost>) query.execute(blogID, lastUpdated);
+	    	if(posts != null) {
+	    		// take care of a GAE Bug
+	    		for(BlogPost post : posts) {
+	    			post.getContents(); // trash this get :(
+	    		}
+	    		return manager.detachCopyAll(posts);
+	    	}
+	    	return posts;
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
+		return null;
+	}	
 
 	@Override
 	public Long getTotalPosts(Long blogID) {
@@ -266,6 +342,49 @@ public class BlogPostServiceImpl implements BlogPostService {
 			manager.close();
 		}
 		return null;
+	}
+
+	/**
+	 * @return the blogService
+	 */
+	public BlogService getBlogService() {
+		return blogService;
+	}
+
+	/**
+	 * @param blogService the blogService to set
+	 */
+	public void setBlogService(BlogService blogService) {
+		this.blogService = blogService;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean isFirstPost(BlogPost post) {
+		if(post != null) {
+			Long blogID = post.getBlogID();
+			PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+			Query query = manager.newQuery(BlogPost.class);
+		    query.setFilter("blogID == blogIDParam && postedDate != null");
+		    query.setOrdering("postedDate desc");
+		    query.declareParameters("String blogIDParam");
+		    query.setRange(0, 1);
+		    
+		    try {
+		    	List<BlogPost> posts = (List<BlogPost>) query.execute(blogID);
+		    	if(posts != null && posts.size() == 1) {
+		    		if(posts.get(0).getPostID().equals(post.getPostID())) {
+		    			return true;
+		    		}
+		    	}
+		    } catch(Exception e) {
+		    	e.printStackTrace();
+		    } finally {
+		    	query.closeAll();
+		    	manager.close();
+		    }
+		}
+		return false;
 	}
 
 }

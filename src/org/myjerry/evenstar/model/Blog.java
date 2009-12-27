@@ -24,7 +24,13 @@ public class Blog {
 	private Text description;
 	
 	@Persistent
+	private String restrictedPostText;
+	
+	@Persistent
 	private String address;
+	
+	@Persistent
+	private String alias;
 	
 	@Persistent
 	private String ownerID;
@@ -117,6 +123,34 @@ public class Blog {
 	 */
 	public void setDescription(String description) {
 		this.description = new Text(description);
+	}
+
+	/**
+	 * @return the alias
+	 */
+	public String getAlias() {
+		return alias;
+	}
+
+	/**
+	 * @param alias the alias to set
+	 */
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+
+	/**
+	 * @return the restrictedPostText
+	 */
+	public String getRestrictedPostText() {
+		return restrictedPostText;
+	}
+
+	/**
+	 * @param restrictedPostText the restrictedPostText to set
+	 */
+	public void setRestrictedPostText(String restrictedPostText) {
+		this.restrictedPostText = restrictedPostText;
 	}
 
 }

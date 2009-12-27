@@ -8,6 +8,8 @@ public class StringUtils {
 	
 	public final static String END_OF_LINE = System.getProperty("line.separator");
 	
+	public final static String EMPTY_STRING = "";
+	
 	public static boolean isEmpty(String string) {
 		if(string == null || string.length() == 0) {
 			return true;
@@ -65,5 +67,21 @@ public class StringUtils {
 			}
 		}
 		return null;
+	}
+	
+	public static Boolean getBoolean(String value) {
+		return getBoolean(value, false);
+	}
+	
+	public static Boolean getBoolean(String value, boolean defaultValue) {
+		if(isNotEmpty(value)) {
+			if("true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value)) {
+				return true;
+			}
+			if("false".equalsIgnoreCase(value) || "no".equalsIgnoreCase(value)) {
+				return false;
+			}
+		}
+		return defaultValue;
 	}
 }

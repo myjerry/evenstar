@@ -6,13 +6,15 @@ import org.myjerry.evenstar.model.Blog;
 
 public interface BlogService {
 	
-	public boolean createBlog(String blogName, String blogAddress);
+	public boolean createBlog(String blogName, String blogAddress, String blogAlias);
 	
-	public boolean deleteBlog(String blogName);
+	public boolean deleteBlog(Long blogID);
 
 	public boolean existsBlogName(String blogTitle);
 
 	public boolean existsBlogAddress(String blogAddress);
+	
+	public boolean existsBlogAlias(String alias);
 	
 	public Collection<Blog> getAllBlogs();
 	
@@ -22,4 +24,8 @@ public interface BlogService {
 	
 	public Blog getBlog(Long blogID);
 
-}
+	public boolean updateBlog(Blog blog);
+
+	public Long getBlogIDForServerName(String serverName);
+	
+	}

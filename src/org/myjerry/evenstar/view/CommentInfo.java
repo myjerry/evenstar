@@ -1,5 +1,9 @@
 package org.myjerry.evenstar.view;
 
+import java.text.SimpleDateFormat;
+
+import org.myjerry.evenstar.model.Comment;
+
 public class CommentInfo {
 	
 	private long id;
@@ -15,6 +19,22 @@ public class CommentInfo {
 	private String deleteUrl;
 	
 	private boolean isDeleted;
+	
+	private boolean restricted;
+
+	public CommentInfo(Comment comment, String commentTimeStampFormat) {
+		if(comment == null) {
+			return;
+		}
+		
+		this.id = comment.getCommentID();
+		this.body = comment.getContent();
+		
+		SimpleDateFormat formatter = new SimpleDateFormat(commentTimeStampFormat);
+		this.timestamp = formatter.format(comment.getTimestamp());
+		
+		this.author = String.valueOf(comment.getAuthorID());
+	}
 
 	/**
 	 * @return the id
@@ -112,6 +132,20 @@ public class CommentInfo {
 	 */
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
+	}
+
+	/**
+	 * @return the restricted
+	 */
+	public boolean isRestricted() {
+		return restricted;
+	}
+
+	/**
+	 * @param restricted the restricted to set
+	 */
+	public void setRestricted(boolean restricted) {
+		this.restricted = restricted;
 	}
 	
 }

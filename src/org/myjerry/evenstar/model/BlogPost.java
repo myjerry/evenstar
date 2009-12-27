@@ -13,6 +13,14 @@ import com.google.appengine.api.datastore.Text;
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class BlogPost {
 	
+	public static final int PRIVACY_MODE_PUBLIC = 1;
+	
+	public static final int PRIVACY_MODE_RESTRICTED = 2;
+	
+	public static final int PRIVACY_MODE_PRIVATE = 4;
+	
+	public static final int PRIVACY_MODE_CUSTOM = 8;
+	
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Long postID;
@@ -28,6 +36,9 @@ public class BlogPost {
 	
 	@Persistent
 	private String labels;
+	
+	@Persistent
+	private Integer privacyMode = PRIVACY_MODE_PUBLIC;
 	
 	@Persistent
 	private Date creationDate;
@@ -185,6 +196,20 @@ public class BlogPost {
 	 */
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	/**
+	 * @return the privacyMode
+	 */
+	public Integer getPrivacyMode() {
+		return privacyMode;
+	}
+
+	/**
+	 * @param privacyMode the privacyMode to set
+	 */
+	public void setPrivacyMode(Integer privacyMode) {
+		this.privacyMode = privacyMode;
 	}
 
 }
