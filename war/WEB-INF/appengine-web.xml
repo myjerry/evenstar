@@ -8,4 +8,11 @@
 		<property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
 	</system-properties>
 	
+	<static-files>
+        <include path="/assets/**" />
+        <include path="/favicon.ico" />
+    </static-files>
+    
+    <sessions-enabled>true</sessions-enabled>
+	
 </appengine-web-app>

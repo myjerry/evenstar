@@ -18,6 +18,12 @@
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
 		<property name="blogService" ref="blogService" />
 	</bean>
+	
+	<bean name="blogSettingsController" class="org.myjerry.evenstar.web.settings.BlogSettingsController" >
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogService" ref="blogService" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
 
 	<bean name="newPostController" class="org.myjerry.evenstar.web.author.NewPostController" >
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
@@ -51,6 +57,19 @@
 		<property name="blogLayoutService" ref="blogLayoutService" />
 		<property name="velocityEngine" ref="velocityEngine" />
 		<property name="commentService" ref="commentService" />
+		<property name="blogUserService" ref="blogUserService" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
+	
+	<bean name="postSearchController" class="org.myjerry.evenstar.web.blog.PostSearchController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPostService" ref="blogPostService" />
+		<property name="blogService" ref="blogService" />
+		<property name="blogLayoutService" ref="blogLayoutService" />
+		<property name="velocityEngine" ref="velocityEngine" />
+		<property name="commentService" ref="commentService" />
+		<property name="blogUserService" ref="blogUserService" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
 	</bean>
 	
 	<bean name="layoutController" class="org.myjerry.evenstar.web.layout.LayoutController">
@@ -61,6 +80,8 @@
 	<bean name="postCommentController" class="org.myjerry.evenstar.web.blog.PostCommentController">
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
 		<property name="commentService" ref="commentService" />
+		<property name="blogService" ref="blogService" />
+		<property name="blogPostService" ref="blogPostService" />
 	</bean>
 	
 	<bean name="replyCommentController" class="org.myjerry.evenstar.web.blog.ReplyCommentController">
@@ -75,7 +96,7 @@
 	
 	<bean name="userAccountController" class="org.myjerry.evenstar.web.user.UserAccountController">
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
-		<property name="userService" ref="userService" />
+		<property name="blogUserService" ref="blogUserService" />
 	</bean>
 	
 	<bean name="viewPostController" class="org.myjerry.evenstar.web.blog.ViewPostController" >
@@ -84,6 +105,55 @@
 		<property name="blogLayoutService" ref="blogLayoutService" />
 		<property name="velocityEngine" ref="velocityEngine" />
 		<property name="commentService" ref="commentService" />
+		<property name="blogService" ref="blogService" />
+		<property name="blogUserService" ref="blogUserService" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
+	
+	<bean name="emailPostController" class="org.myjerry.evenstar.web.blog.EmailPostController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogEmailService" ref="blogEmailService" />
+	</bean>
+	
+	<bean name="securitySettingsController" class="org.myjerry.evenstar.web.settings.SecuritySettingsController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogService" ref="blogService" />
+		<property name="commentService" ref="commentService" />
+	</bean>
+	
+	<bean name="formatSettingsController" class="org.myjerry.evenstar.web.settings.FormatSettingsController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
+	
+	<bean name="commentSettingsController" class="org.myjerry.evenstar.web.settings.CommentSettingsController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
+
+	<bean name="archiveSettingsController" class="org.myjerry.evenstar.web.settings.ArchiveSettingsController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
+
+	<bean name="feedSettingsController" class="org.myjerry.evenstar.web.settings.FeedSettingsController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
+
+	<bean name="emailSettingsController" class="org.myjerry.evenstar.web.settings.EmailSettingsController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
+
+	<bean name="openIdSettingsController" class="org.myjerry.evenstar.web.settings.OpenIdSettingsController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
+
+	<bean name="toolSettingsController" class="org.myjerry.evenstar.web.settings.ToolSettingsController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
 	</bean>
 
 </beans>

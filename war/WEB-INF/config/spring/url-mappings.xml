@@ -9,6 +9,7 @@
 		<property name="mappings">
 			<props>
 				<prop key="/index.html">blogHomeController</prop>
+				<prop key="/showPosts.html">blogHomeController</prop>
 				<prop key="/viewPost.html">viewPostController</prop>
 				
 				<prop key="/noAccess.html">urlTilenameController</prop>
@@ -17,7 +18,7 @@
 				<prop key="/admin/createBlog.html">createBlogController</prop>
 				<prop key="/admin/setDefaultBlog.html">defaultBlogController</prop>
 				
-				<prop key="/admin/settings.html">urlTilenameController</prop>
+				<prop key="/admin/settings.html">blogSettingsController</prop>
 				<prop key="/admin/layout.html">layoutController</prop>
 				 
 				<prop key="/startBlogging.html">urlTilenameController</prop>
@@ -27,20 +28,22 @@
 				<prop key="/author/post.html">postController</prop>
 				<prop key="/author/deletePost.html">deletePostController</prop>
 				
-				<prop key="/admin/settings/format.html">urlTilenameController</prop>
-				<prop key="/admin/settings/comments.html">urlTilenameController</prop>
-				<prop key="/admin/settings/archives.html">urlTilenameController</prop>
-				<prop key="/admin/settings/feed.html">urlTilenameController</prop>
-				<prop key="/admin/settings/email.html">urlTilenameController</prop>
-				<prop key="/admin/settings/openID.html">urlTilenameController</prop>
-				<prop key="/admin/settings/security.html">urlTilenameController</prop>
-				<prop key="/admin/settings/tools.html">urlTilenameController</prop>
+				<prop key="/admin/settings/format.html">formatSettingsController</prop>
+				<prop key="/admin/settings/comments.html">commentSettingsController</prop>
+				<prop key="/admin/settings/archives.html">archiveSettingsController</prop>
+				<prop key="/admin/settings/feed.html">feedSettingsController</prop>
+				<prop key="/admin/settings/email.html">emailSettingsController</prop>
+				<prop key="/admin/settings/openID.html">openIdSettingsController</prop>
+				<prop key="/admin/settings/security.html">securitySettingsController</prop>
+				<prop key="/admin/settings/tools.html">toolSettingsController</prop>
 				
 				<prop key="/postComment.html">postCommentController</prop>
 				<prop key="/replyComment.html">replyCommentController</prop>
 				<prop key="/deleteComment.html">deleteCommentController</prop>
 				
 				<prop key="/myAccount.html">userAccountController</prop>
+				
+				<prop key="/emailPost.html">emailPostController</prop>
 				
 				<!-- For all other URIs that do not match, forward the user to a generic Page Not Found page. -->
         		<prop key="/**">pageNotFoundController</prop>

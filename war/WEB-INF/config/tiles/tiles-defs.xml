@@ -8,7 +8,6 @@
 
 	<definition name=".masterLayout" template="/WEB-INF/jsps/templates/master.jsp">
 		<put-attribute name="title" value="Blogging machine" />
-		<put-attribute name="leftnav" value="/WEB-INF/jsps/templates/leftnav.jsp" />
 		<put-attribute name="body" value="/WEB-INF/jsps/templates/blank.jsp" />
 	</definition>
 	
@@ -142,10 +141,24 @@
 	
 	<definition name=".view.blog.home" template="/WEB-INF/jsps/blog/viewHome.jsp" />
 	
-	<definition name=".post.comments" template="/WEB-INF/jsps/blog/postComment.jsp" />
+	<definition name=".post.comments" extends=".masterLayout" >
+		<put-attribute name="title" value="Post Comment" />
+		<put-attribute name="body" value="/WEB-INF/jsps/blog/postComment.jsp" />
+	</definition>
 	
-	<definition name=".reply.comment" template="/WEB-INF/jsps/blog/replyComment.jsp" />
+	<definition name=".reply.comment" extends=".masterLayout" >
+		<put-attribute name="title" value="Post Comment" />
+		<put-attribute name="body" value="/WEB-INF/jsps/blog/replyComment.jsp" />
+	</definition>	
 	
-	<definition name=".delete.comment" template="/WEB-INF/jsps/blog/deleteComment.jsp" />
+	<definition name=".delete.comment" extends=".masterLayout" >
+		<put-attribute name="title" value="Delete Comment" />
+		<put-attribute name="body" value="/WEB-INF/jsps/blog/deleteComment.jsp" />
+	</definition>
+	
+	<definition name=".email.post" extends=".masterLayout">
+		<put-attribute name="title" value="Email Post" />
+		<put-attribute name="body" value="/WEB-INF/jsps/blog/emailPost.jsp" />
+	</definition>
 
 </tiles-definitions>

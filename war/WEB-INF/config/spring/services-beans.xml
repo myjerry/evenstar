@@ -9,7 +9,9 @@
 		<property name="preferenceService" ref="preferenceService" />
 	</bean>
 	
-	<bean name="blogPostService" class="org.myjerry.evenstar.service.impl.BlogPostServiceImpl" />
+	<bean name="blogPostService" class="org.myjerry.evenstar.service.impl.BlogPostServiceImpl" >
+		<property name="blogService" ref="blogService" />
+	</bean>
 	
 	<bean name="preferenceService" class="org.myjerry.evenstar.service.impl.PreferenceServiceImpl" />
 	
@@ -19,7 +21,7 @@
 	
 	<bean name="feedService" class="org.myjerry.evenstar.service.impl.FeedServiceImpl" />
 	
-	<bean name="blogEmalService" class="org.myjerry.evenstar.service.impl.BlogEmailServiceImpl" />
+	<bean name="blogEmailService" class="org.myjerry.evenstar.service.impl.BlogEmailServiceImpl" />
 
 	<bean name="blogLayoutService" class="org.myjerry.evenstar.service.impl.BlogLayoutServiceImpl" >
 		<property name="defaultTemplate" value="/WEB-INF/blogTemplates/default.vm" />
@@ -29,6 +31,6 @@
 		<property name="preferFileSystemAccess" value="false" />
 	</bean>
 	
-	<bean name="userService" class="org.myjerry.evenstar.service.impl.EvenstarUserServiceImpl" />	
+	<bean name="blogUserService" class="org.myjerry.evenstar.service.impl.BlogUserServiceImpl" />	
 
 </beans>
