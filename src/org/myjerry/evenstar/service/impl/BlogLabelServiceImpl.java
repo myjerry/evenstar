@@ -109,6 +109,15 @@ public class BlogLabelServiceImpl implements BlogLabelService {
 
 	@Override
 	public void updatePostLabels(Long blogID, Long postID, String oldLabels, String newLabels) {
+		if(blogID == null || postID == null) {
+			return;
+		}
+		
+		if(oldLabels != null && oldLabels.equals(newLabels)) {
+			// all labels are same - nothing to do
+			return;
+		}
+		
 		if(StringUtils.isEmpty(newLabels)) {
 			this.deleteLabelsForPost(blogID, postID, oldLabels);
 		}

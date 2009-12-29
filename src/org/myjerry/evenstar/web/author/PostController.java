@@ -93,13 +93,19 @@ public class PostController extends MultiActionController {
 	}
 	
 	private BlogPost contructBlogPostFromRequest(HttpServletRequest request) {
-		BlogPost post = new BlogPost();
+		BlogPost post = null;
 		
-		String postID = request.getParameter("postID");
-		if(StringUtils.isNotEmpty(postID)) {
-			post.setPostID(new Long(postID));
+		Long postID = StringUtils.getLong(request.getParameter("postID"));
+		Long blogID = StringUtils.getLong(request.getParameter("blogID"));
+		if(postID != null && blogID != null) {
+			post = this.blogPostService.getPost(postID, blogID);
 		}
-		post.setBlogID(new Long(request.getParameter("blogID")));
+		
+		if(post == null) {
+			post = new BlogPost();
+		}
+		
+		post.setBlogID(blogID);
 		post.setTitle(request.getParameter("postTitle"));
 		post.setContents(request.getParameter("postContents"));
 		String labels = request.getParameter("labels");

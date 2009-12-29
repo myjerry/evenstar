@@ -4,6 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.myjerry.evenstar.service.BlogLayoutService;
+import org.myjerry.util.RequestUtil;
+import org.myjerry.util.ResponseUtil;
+import org.myjerry.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -31,6 +34,12 @@ public class LayoutController extends MultiActionController {
 		mav.setViewName(".admin.layout");
 		mav.addObject("blogID", request.getParameter("blogID"));
 		return mav;
+	}
+	
+	public ModelAndView downloadTemplate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Long blogID = StringUtils.getLong(request.getParameter("blogID"));
+		String templateCode = this.blogLayoutService.getBlogTemplate(blogID);
+		return ResponseUtil.sendFileToDownload(response, templateCode, "template.vm", "text/plain", RequestUtil.isHttp11(request));
 	}
 	
 	public ModelAndView saveTemplate(HttpServletRequest request, HttpServletResponse response) throws Exception {
