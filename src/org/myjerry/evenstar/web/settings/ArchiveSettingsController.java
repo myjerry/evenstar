@@ -22,12 +22,8 @@ public class ArchiveSettingsController extends MultiActionController {
 		mav.addObject("blogID", blogID);
 		
 		String archiveFrequency = this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.archiveFrequency);
-		String postPages = this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.postPages);
-		String archiveIndexFormat = this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.archiveIndexFormat);
 
 		mav.addObject("archiveFrequency", archiveFrequency);
-		mav.addObject("postPages", postPages);
-		mav.addObject("archiveIndexFormat", archiveIndexFormat);
 		
 		mav.setViewName(".admin.settings.archives");
 		return mav;
@@ -40,16 +36,10 @@ public class ArchiveSettingsController extends MultiActionController {
 		mav.addObject("blogID", blogID);
 
 		String archiveFrequency = request.getParameter("archiveFrequency");
-		String postPages = request.getParameter("postPages");
-		String archiveIndexFormat = request.getParameter("archiveIndexFormat");
 		
 		this.blogPreferenceService.putPreference(blogID, BlogPreferenceConstants.archiveFrequency, archiveFrequency);
-		this.blogPreferenceService.putPreference(blogID, BlogPreferenceConstants.postPages, postPages);
-		this.blogPreferenceService.putPreference(blogID, BlogPreferenceConstants.archiveIndexFormat, archiveIndexFormat);
 
 		mav.addObject("archiveFrequency", archiveFrequency);
-		mav.addObject("postPages", postPages);
-		mav.addObject("archiveIndexFormat", archiveIndexFormat);
 		
 		mav.setViewName(".admin.settings.archives");
 		return mav;

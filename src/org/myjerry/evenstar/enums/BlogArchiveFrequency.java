@@ -20,7 +20,7 @@ public enum BlogArchiveFrequency {
 		} else if("monthly".equalsIgnoreCase(string)) {
 			return MONTHLY;
 		}
-		return NONE;
+		return MONTHLY;
 	}
 	
 	@Override
@@ -36,14 +36,15 @@ public enum BlogArchiveFrequency {
 				value = "weekly";
 				break;
 				
-			case MONTHLY:
-				value = "monthly";
-				break;
-				
 			case NONE:
 				value = "none";
 				break;
 			
+			case MONTHLY:
+			default:
+				value = "monthly";
+				break;
+				
 		}
 		
 		return value;

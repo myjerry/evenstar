@@ -6,6 +6,8 @@ public class ArchiveKey implements Comparable<ArchiveKey> {
 	
 	private Integer key;
 	
+	private String url;
+	
 	public ArchiveKey(Integer key) {
 		this.key = key;
 	}
@@ -15,8 +17,10 @@ public class ArchiveKey implements Comparable<ArchiveKey> {
 		this.name = name;
 	}
 	
-	public String getUrl() {
-		return "/showPosts.html";
+	public ArchiveKey(Integer key, String name, String url) {
+		this.key = key;
+		this.name = name;
+		this.url = url;
 	}
 	
 	@Override
@@ -88,6 +92,20 @@ public class ArchiveKey implements Comparable<ArchiveKey> {
 	 */
 	public void setKey(Integer key) {
 		this.key = key;
+	}
+
+	/**
+	 * @param url the url to set
+	 */
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	/**
+	 * @return the url
+	 */
+	public String getUrl() {
+		return url;
 	}
 
 }

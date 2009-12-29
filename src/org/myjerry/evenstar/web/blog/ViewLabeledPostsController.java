@@ -1,16 +1,30 @@
 package org.myjerry.evenstar.web.blog;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.app.VelocityEngine;
+import org.myjerry.evenstar.constants.BlogPreferenceConstants;
 import org.myjerry.evenstar.helper.ControllerHelper;
+import org.myjerry.evenstar.helper.TemplateHelper;
+import org.myjerry.evenstar.model.Blog;
+import org.myjerry.evenstar.model.BlogPost;
+import org.myjerry.evenstar.service.BlogLabelService;
 import org.myjerry.evenstar.service.BlogLayoutService;
 import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.evenstar.service.BlogPreferenceService;
 import org.myjerry.evenstar.service.BlogService;
 import org.myjerry.evenstar.service.BlogUserService;
 import org.myjerry.evenstar.service.CommentService;
+import org.myjerry.evenstar.service.ViewPostService;
+import org.myjerry.util.ServerUtils;
+import org.myjerry.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -38,20 +52,64 @@ public class ViewLabeledPostsController extends MultiActionController {
 	@Autowired
 	private BlogUserService blogUserService;
 	
+	@Autowired
+	private BlogLabelService blogLabelService;
+	
+	@Autowired
+	private ViewPostService viewPostService;
+	
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Long blogID = ControllerHelper.convertToBlogID(request, this.blogService);
 		String label = request.getParameter("label");
-		String older = request.getParameter("older");
-		String newer = request.getParameter("newer");
+		Long older = StringUtils.getLong(request.getParameter("older"));
+		Long newer = StringUtils.getLong(request.getParameter("newer"));
+		
+		Long blogID = ControllerHelper.convertToBlogID(request, this.blogService);
+		Long labelID = this.blogLabelService.getLabelID(blogID, label);
 		
 		ModelAndView mav = new ModelAndView();
 		
-		if(blogID == null) {
+		if(blogID == null || labelID == null) {
 			mav.setViewName(".evenstar");
 		} else {
+			Map<String, Object> model = new HashMap<String, Object>();
 			
+			Blog blog = this.blogService.getBlog(blogID);
+			String numPostsString = this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.showNumPosts);
+			int numPosts = 10;
+			if(StringUtils.isNotEmpty(numPostsString)) {
+				numPosts = Integer.valueOf(numPostsString);
+			}
+			
+			Collection<BlogPost> postsCollection = null;
+			postsCollection = this.blogPostService.getBlogPostsForLabel(blogID, labelID, numPosts, older, newer);
+			
+			List<BlogPost> posts = new ArrayList<BlogPost>(postsCollection);
+
+			if(posts != null && posts.size() > 0) {
+				if(posts.size() > numPosts) {
+					int last = posts.size() - 1;
+					BlogPost lastPost = posts.get(last);
+					model.put("olderPageUrl", "/showPostsForLabel.html?label=" + label + "&older=" + ServerUtils.getUniversalDateString(lastPost.getPostedDate()));
+					posts.remove(last);
+				} else {
+					model.put("olderPageUrl", "");
+				}
+				
+				if(!this.blogPostService.isFirstPost(posts.get(0))) {
+					model.put("newerPageUrl", "/showPostsForLabel.html?label=" + label + "&newer=" + ServerUtils.getUniversalDateString(posts.get(0).getPostedDate()));
+				} else {
+					model.put("newerPageUrl", "");
+				}
+			}
+			
+			model = this.viewPostService.getPostsViewModel(blog, posts, false, model);
+			String generatedBlogPage = TemplateHelper.generateBlogPage(blogID, model, blogLayoutService, velocityEngine);
+			
+			mav.addAllObjects(model);
+			mav.addObject("generatedBlogPage", generatedBlogPage);
+			mav.setViewName(".view.blog.home");
 		}
-		mav.setViewName(".evenstar");
+
 		return mav;
 	}
 
@@ -151,6 +209,34 @@ public class ViewLabeledPostsController extends MultiActionController {
 	 */
 	public void setBlogUserService(BlogUserService blogUserService) {
 		this.blogUserService = blogUserService;
+	}
+
+	/**
+	 * @return the blogLabelService
+	 */
+	public BlogLabelService getBlogLabelService() {
+		return blogLabelService;
+	}
+
+	/**
+	 * @param blogLabelService the blogLabelService to set
+	 */
+	public void setBlogLabelService(BlogLabelService blogLabelService) {
+		this.blogLabelService = blogLabelService;
+	}
+
+	/**
+	 * @return the viewPostService
+	 */
+	public ViewPostService getViewPostService() {
+		return viewPostService;
+	}
+
+	/**
+	 * @param viewPostService the viewPostService to set
+	 */
+	public void setViewPostService(ViewPostService viewPostService) {
+		this.viewPostService = viewPostService;
 	}
 
 }

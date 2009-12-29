@@ -68,10 +68,7 @@ public class CommentSettingsController extends MultiActionController {
 	}
 	
 	public ModelAndView update(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ModelAndView mav = new ModelAndView();
-		
 		Long blogID = StringUtils.getLong(request.getParameter("blogID"));
-		mav.addObject("blogID", blogID);
 
 		String showComments = request.getParameter("showComments");
 		String whoCanComment = request.getParameter("whoCanComment");
@@ -95,18 +92,7 @@ public class CommentSettingsController extends MultiActionController {
 		this.blogPreferenceService.putPreference(blogID, BlogPreferenceConstants.showBackLinks, showBackLinks);
 		this.blogPreferenceService.putPreference(blogID, BlogPreferenceConstants.backLinksInNewPosts, backLinksOnNewPosts);
 		
-		mav.addObject("showComments", showComments);
-		mav.addObject("whoCanComment", whoCanComment);
-		mav.addObject("commentFormPlacement", commentFormPlacement);
-		mav.addObject("commentsOnNewPosts", commentsOnNewPosts);
-		mav.addObject("commentTimeStampFormat", commentTimeStampFormat);
-		mav.addObject("commentModeration", commentModeration);
-		mav.addObject("commentCaptcha", commentCaptcha);
-		mav.addObject("commentNotificationMail", commentNotificationMail);
-		mav.addObject("showBackLinks", showBackLinks);
-		mav.addObject("backLinksOnNewPosts", backLinksOnNewPosts);
-		
-		mav.setViewName(".admin.settings.comments");
+		ModelAndView mav = view(request, response);
 		return mav;
 	}
 

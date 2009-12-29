@@ -48,13 +48,8 @@ public class BlogHomeController extends MultiActionController {
 	private ViewPostService viewPostService;
 
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		boolean searchMode = false;
-		String uri = request.getRequestURI();
-		String older = request.getParameter("older");
-		String newer = request.getParameter("newer");
-		if(uri.equals("/showPosts.html")) {
-			searchMode = true;
-		}
+		Long older = StringUtils.getLong(request.getParameter("older"));
+		Long newer = StringUtils.getLong(request.getParameter("newer"));
 		
 		ModelAndView mav = new ModelAndView();
 		Long blogID = ControllerHelper.convertToBlogID(request, this.blogService);
@@ -73,14 +68,15 @@ public class BlogHomeController extends MultiActionController {
 			}
 			
 			Collection<BlogPost> postsCollection = null;
-			if(!searchMode) {
+			if(older == null && newer == null) {
 				postsCollection = this.blogPostService.getBlogPosts(blogID, numPosts);
 			} else {
-				if(StringUtils.isNotEmpty(older)) {
+				if(older != null && newer != null) {
+					postsCollection = this.blogPostService.getBlogPosts(blogID, numPosts, older, newer);
+				} else if(older != null) {
 					Date lastUpdatedDate = ServerUtils.getUniversalDate(older);
 					postsCollection = this.blogPostService.getOlderBlogPosts(blogID, numPosts, lastUpdatedDate);
-				}
-				if(StringUtils.isNotEmpty(newer)) {
+				} else if(newer != null) {
 					Date lastUpdatedDate = ServerUtils.getUniversalDate(newer);
 					postsCollection = this.blogPostService.getNewerBlogPosts(blogID, numPosts, lastUpdatedDate);
 				}

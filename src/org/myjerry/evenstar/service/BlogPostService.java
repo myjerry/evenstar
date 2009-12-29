@@ -23,6 +23,12 @@ public interface BlogPostService {
 	
 	public Collection<BlogPost> getBlogPosts(Long blogID, int count);
 	
+	public Collection<BlogPost> getBlogPosts(Long blogID, int count, Long olderThan, Long newerThan);
+	
+	public Collection<BlogPost> getBlogPostsForLabel(Long blogID, Long labelID, int count);
+	
+	public Collection<BlogPost> getBlogPostsForLabel(Long blogID, Long labelID, int count, Long olderThan, Long newerThan);
+	
 	public Collection<BlogPost> getOlderBlogPosts(Long blogID, int count, Date lastUpdated);
 	
 	public Collection<BlogPost> getNewerBlogPosts(Long blogID, int count, Date lastUpdated);
@@ -36,5 +42,9 @@ public interface BlogPostService {
 	public boolean isFirstPost(BlogPost post);
 
 	public Date getLastPublishedPostDate(Long blogID);
+
+	public String getOlderPostUrl(Long blogID, Date date);
+
+	public String getNewerPostUrl(Long blogID,Date date);
 
 }

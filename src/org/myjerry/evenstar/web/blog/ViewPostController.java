@@ -46,7 +46,12 @@ public class ViewPostController extends MultiActionController {
 		Blog blog = this.blogService.getBlog(blogID);
 		BlogPost post = this.blogPostService.getPost(postID, blogID);
 		
+		String olderPostUrl = this.blogPostService.getOlderPostUrl(blogID, post.getPostedDate());
+		String newerPostUrl = this.blogPostService.getNewerPostUrl(blogID, post.getPostedDate());
+		
 		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("olderPageUrl", olderPostUrl);
+		model.put("newerPageUrl", newerPostUrl);
 		
 		model = this.viewPostService.getPostsViewModel(blog, Arrays.asList(post), true, model);
 		String generatedBlogPage = TemplateHelper.generateBlogPage(blogID, model, blogLayoutService, velocityEngine);

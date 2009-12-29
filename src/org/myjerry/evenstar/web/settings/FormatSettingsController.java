@@ -78,15 +78,7 @@ public class FormatSettingsController extends MultiActionController {
 		this.blogPreferenceService.putPreference(blogID, BlogPreferenceConstants.convertLineBreaks, convertLineBreaks);
 		this.blogPreferenceService.putPreference(blogID, BlogPreferenceConstants.postTemplate, postTemplate);
 
-		mav.addObject("numPosts", numPosts);
-		mav.addObject("dateHeaderFormat", dateHeaderFormat);
-		mav.addObject("postTimeStampFormat", postTimeStampFormat);
-		mav.addObject("postTimeZoneFormat", postTimeZoneFormat);
-		mav.addObject("convertLineBreaks", convertLineBreaks);
-		mav.addObject("postTemplate", postTemplate);
-		
-		mav.setViewName(".admin.settings.format");
-		return mav;
+		return view(request, response);
 	}
 
 	/**

@@ -20,5 +20,11 @@ public class ServerUtils {
 		date.setTime(Long.valueOf(string));
 		return date;
 	}
+	
+	public static Date getUniversalDate(Long time) {
+		Date date = new Date();
+		date.setTime(time);
+		return date;
+	}
 
 }

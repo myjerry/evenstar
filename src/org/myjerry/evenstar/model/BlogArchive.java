@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.myjerry.evenstar.constants.CalendarConstants;
 import org.myjerry.evenstar.core.ArchiveKey;
 import org.myjerry.evenstar.enums.BlogArchiveFrequency;
@@ -71,7 +72,7 @@ public class BlogArchive {
 		
 			// month, monthIndex
 			Map<ArchiveKey, List<BlogArchivePost>> monthIndex = null;
-			key = new ArchiveKey(year);
+			key = getYearKey(year);
 			if(yearIndex.containsKey(key)) {
 				monthIndex = yearIndex.get(key);
 			} else {
@@ -80,7 +81,7 @@ public class BlogArchive {
 			}
 			
 			List<BlogArchivePost> list = null;
-			key = new ArchiveKey(month, CalendarConstants.MONTHS[month - 1]);
+			key = getMonthKey(year, month);
 			if(monthIndex.containsKey(key)) {
 				list = monthIndex.get(key);
 			} else {
@@ -104,10 +105,12 @@ public class BlogArchive {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(post.getPostedDate());
 			int year = calendar.get(Calendar.YEAR);
+			int month = calendar.get(Calendar.MONTH) + 1;
+			int day = calendar.get(Calendar.DATE);
 			int week = calendar.get(Calendar.WEEK_OF_YEAR);
 			
 			Map<ArchiveKey, List<BlogArchivePost>> weekIndex = null;
-			key = new ArchiveKey(year);
+			key = getYearKey(year);
 			if(yearIndex.containsKey(key)) {
 				weekIndex = yearIndex.get(key);
 			} else {
@@ -116,7 +119,7 @@ public class BlogArchive {
 			}
 			
 			List<BlogArchivePost> list = null;
-			key = new ArchiveKey(week);
+			key = getWeekKey(year, month, day, week);
 			if(weekIndex.containsKey(key)) {
 				list = weekIndex.get(key);
 			} else {
@@ -147,7 +150,7 @@ public class BlogArchive {
 		
 			// month, monthIndex
 			Map<ArchiveKey, Map<ArchiveKey, List<BlogArchivePost>>> monthIndex = null;
-			key = new ArchiveKey(year);
+			key = getYearKey(year);
 			if(yearIndex.containsKey(key)) {
 				monthIndex = yearIndex.get(key);
 			} else {
@@ -157,7 +160,7 @@ public class BlogArchive {
 			
 			// day, posts
 			Map<ArchiveKey, List<BlogArchivePost>> dayIndex = null;
-			key = new ArchiveKey(month, CalendarConstants.MONTHS[month - 1]);
+			key = getMonthKey(year, month);
 			if(monthIndex.containsKey(key)) {
 				dayIndex = monthIndex.get(key);
 			} else {
@@ -166,7 +169,7 @@ public class BlogArchive {
 			}
 			
 			List<BlogArchivePost> list = null;
-			key = new ArchiveKey(day, CalendarConstants.MONTHS[month - 1] + " " + day);
+			key = getDayKey(year, month, day);
 			if(dayIndex.containsKey(key)) {
 				list = dayIndex.get(key);
 			} else {
@@ -178,6 +181,58 @@ public class BlogArchive {
 		}
 		
 		return yearIndex;
+	}
+	
+	private static final ArchiveKey getYearKey(int year) {
+		ArchiveKey key = new ArchiveKey(year);
+		
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(year, 0, 1, 0, 0, 0);
+		Long firstDay = calendar.getTimeInMillis();
+		calendar.set(year, 11, 31, 23, 59, 59);
+		Long lastDay = calendar.getTimeInMillis();
+		
+		key.setUrl("/showPosts.html?newer=" + firstDay + "&older=" + lastDay);
+		
+		return key;
+	}
+	
+	private static final ArchiveKey getMonthKey(int year, int month) {
+		ArchiveKey key = new ArchiveKey(month, CalendarConstants.MONTHS[month - 1]);
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(year, month - 1, 1, 0, 0, 0);
+		Long firstDay = calendar.getTimeInMillis();
+		int lastDate = calendar.getActualMaximum(Calendar.DATE);
+		calendar.set(year, month - 1, lastDate, 23, 59, 59);
+		Long lastDay = calendar.getTimeInMillis();
+		
+		key.setUrl("/showPosts.html?newer=" + firstDay + "&older=" + lastDay);
+
+		return key;
+	}
+	
+	private static final ArchiveKey getWeekKey(int year, int month, int day, int week) {
+		ArchiveKey key = new ArchiveKey(week);
+		
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(year, month, day);
+
+		return key;
+	}
+	
+	private static final ArchiveKey getDayKey(int year, int month, int day) {
+		ArchiveKey key = new ArchiveKey(day, CalendarConstants.MONTHS[month - 1] + " " + day);
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(year, month - 1, day, 0, 0, 0);
+		Long firstDay = calendar.getTimeInMillis();
+		calendar.set(year, month - 1, day, 23, 59, 59);
+		Long lastDay = calendar.getTimeInMillis();
+		
+		key.setUrl("/showPosts.html?newer=" + firstDay + "&older=" + lastDay);
+
+		return key;
 	}
 
 	/**

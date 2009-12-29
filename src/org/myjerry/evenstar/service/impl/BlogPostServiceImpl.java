@@ -1,5 +1,6 @@
 package org.myjerry.evenstar.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -8,8 +9,10 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.myjerry.evenstar.helper.SortHelper;
 import org.myjerry.evenstar.model.Blog;
 import org.myjerry.evenstar.model.BlogPost;
+import org.myjerry.evenstar.model.BlogPostLabelMapping;
 import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
 import org.myjerry.evenstar.service.BlogLabelService;
 import org.myjerry.evenstar.service.BlogPostService;
@@ -22,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -43,7 +47,9 @@ public class BlogPostServiceImpl implements BlogPostService {
 		}
 		blogPost.setLastUpdated(ServerUtils.getServerDate());
 		blogPost.setLastUpdateUser(GAEUserUtil.getUserID());
-		blogPost.setPostedDate(ServerUtils.getServerDate());
+		if(blogPost.getPostedDate() == null) {
+			blogPost.setPostedDate(ServerUtils.getServerDate());
+		}
 
 		if(StringUtils.isEmpty(blogPost.getUrl())) {
 			// this also means that we need to create a new URL for this service
@@ -238,6 +244,121 @@ public class BlogPostServiceImpl implements BlogPostService {
 	
 	@SuppressWarnings("unchecked")
 	@Override
+	public Collection<BlogPost> getBlogPosts(Long blogID, int count, Long olderThan, Long newerThan) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(BlogPost.class);
+	    query.setFilter("blogID == blogIDParam && postedDate != null");
+	    query.setOrdering("postedDate desc");
+	    query.declareParameters("String blogIDParam");
+	    
+	    try {
+	    	List<BlogPost> allPosts = (List<BlogPost>) query.execute(blogID);
+	    	if(allPosts != null && allPosts.size() > 0) {
+
+	    		List<BlogPost> posts = new ArrayList<BlogPost>();
+	    		int length = count + 1;
+	    		if(length > allPosts.size()) {
+	    			length = allPosts.size();
+	    		}
+
+	    		for(int i=0; i < allPosts.size(); i++) {
+	    			BlogPost post = allPosts.get(i);
+	    			Date posted = post.getPostedDate();
+	    			if(posted != null) {
+	    				long time = posted.getTime();
+	    				if(olderThan != null && time > olderThan) {
+	    					continue;
+	    				}
+	    				if(newerThan != null && time < newerThan) {
+	    					continue;
+	    				}
+	    				
+	    				post.getContents();
+	    				post = manager.detachCopy(post);
+	    				posts.add(post);
+	    				
+	    				if(posts.size() == length) {
+	    					break;
+	    				}
+	    			}
+	    		}
+	    		
+	    		return posts;
+	    	}
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
+		return null;
+	}
+
+	@Override
+	public Collection<BlogPost> getBlogPostsForLabel(Long blogID, Long labelID, int count) {
+		return getBlogPostsForLabel(blogID, labelID, count, null, null);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<BlogPost> getBlogPostsForLabel(Long blogID, Long labelID, int count, Long olderThan, Long newerThan) {
+		DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+
+		// get a list of all IDs that match this label
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(BlogPostLabelMapping.class.getSimpleName());
+		query.addFilter("blogID", FilterOperator.EQUAL, blogID);
+		query.addFilter("labelID", FilterOperator.EQUAL, labelID);
+		FetchOptions fetchOptions = FetchOptions.Builder.withOffset(0).limit(Integer.MAX_VALUE);
+		PreparedQuery preparedQuery = datastoreService.prepare(query);
+		List<Entity> list = preparedQuery.asList(fetchOptions);
+		
+		List<Long> postIDs = new ArrayList<Long>();
+		if(list.size() > 0) {
+			for(Entity entity : list) {
+				Long id = (Long) entity.getProperty("postID");
+				postIDs.add(id);
+			}
+		}
+		
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query q = manager.newQuery(BlogPost.class, ":p.contains(postID)");
+		List<BlogPost> allPosts = (List<BlogPost>) q.execute(postIDs);
+		SortHelper.sortPosts(allPosts);
+		
+		// get first count + 1 objects
+		List<BlogPost> posts = new ArrayList<BlogPost>();
+		int length = count + 1;
+		if(length > allPosts.size()) {
+			length = allPosts.size();
+		}
+
+		for(int i=0; i < allPosts.size(); i++) {
+			BlogPost post = allPosts.get(i);
+			Date posted = post.getPostedDate();
+			if(posted != null) {
+				long time = posted.getTime();
+				if(olderThan != null && time > olderThan) {
+					continue;
+				}
+				if(newerThan != null && time < newerThan) {
+					continue;
+				}
+				
+				post.getContents();
+				post = manager.detachCopy(post);
+				posts.add(post);
+				
+				if(posts.size() == length) {
+					break;
+				}
+			}
+		}
+		
+		return posts;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
 	public Collection<BlogPost> getOlderBlogPosts(Long blogID, int count, Date lastUpdated) {
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		Query query = manager.newQuery(BlogPost.class);
@@ -426,6 +547,59 @@ public class BlogPostServiceImpl implements BlogPostService {
 		return null;
 	}
 
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public String getNewerPostUrl(Long blogID, Date date) {
+		if(blogID != null && date != null) {
+			PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+			Query query = manager.newQuery(BlogPost.class, "blogID == blogIDParam && postedDate > postedDateParam");
+			query.setOrdering("postedDate asc");
+			query.declareImports("import java.util.Date");
+		    query.declareParameters("Long blogIDParam, Date postedDateParam");
+		    query.setRange(0, 1);
+			
+		    try {
+		    	List<BlogPost> posts = (List<BlogPost>) query.execute(blogID, date);
+		    	if(posts != null && posts.size() == 1) {
+		    		return posts.get(0).getUrl();
+		    	}
+		    } catch(Exception e) {
+		    	e.printStackTrace();
+		    } finally {
+		    	query.closeAll();
+		    	manager.close();
+		    }
+		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public String getOlderPostUrl(Long blogID, Date date) {
+		if(blogID != null && date != null) {
+			PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+			Query query = manager.newQuery(BlogPost.class, "blogID == blogIDParam && postedDate < postedDateParam");
+			query.setOrdering("postedDate desc");
+			query.declareImports("import java.util.Date");
+		    query.declareParameters("Long blogIDParam, Date postedDateParam");
+		    query.setRange(0, 1);
+			
+		    try {
+		    	List<BlogPost> posts = (List<BlogPost>) query.execute(blogID, date);
+		    	if(posts != null && posts.size() == 1) {
+		    		return posts.get(0).getUrl();
+		    	}
+		    } catch(Exception e) {
+		    	e.printStackTrace();
+		    } finally {
+		    	query.closeAll();
+		    	manager.close();
+		    }
+		}
+		return null;
+	}
+
 	/**
 	 * @return the blogService
 	 */
@@ -453,5 +627,4 @@ public class BlogPostServiceImpl implements BlogPostService {
 	public void setBlogLabelService(BlogLabelService blogLabelService) {
 		this.blogLabelService = blogLabelService;
 	}
-
 }

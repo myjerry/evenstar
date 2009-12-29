@@ -176,6 +176,10 @@ public class BlogLabelServiceImpl implements BlogLabelService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Long getLabelID(Long blogID, String label) {
+		if(blogID == null || StringUtils.isEmpty(label)) {
+			return null;
+		}
+		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		try {
 			Query query = manager.newQuery(BlogLabel.class, "blogID == blogIDParam && escapedLabel == labelParam ");
@@ -216,6 +220,10 @@ public class BlogLabelServiceImpl implements BlogLabelService {
 	}
 	
 	private void labelPost(Long blogID, Long postID, String label) {
+		if(blogID == null || postID == null || StringUtils.isEmpty(label)) {
+			return;
+		}
+		
 		// add the new label token, if needed
 		Long labelID = addUpdateLabelID(blogID, label);
 		// create the post mapping
@@ -224,6 +232,10 @@ public class BlogLabelServiceImpl implements BlogLabelService {
 	}
 	
 	private Long addUpdateLabelID(Long blogID, String label) {
+		if(blogID == null || StringUtils.isEmpty(label)) {
+			return null;
+		}
+		
 		Long labelID = getLabelID(blogID, label);
 		if(labelID == null) {
 			// create a new one
