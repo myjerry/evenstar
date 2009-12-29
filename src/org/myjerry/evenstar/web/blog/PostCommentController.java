@@ -5,10 +5,13 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.myjerry.evenstar.constants.BlogPreferenceConstants;
+import org.myjerry.evenstar.enums.CommentModerationType;
 import org.myjerry.evenstar.model.Blog;
 import org.myjerry.evenstar.model.BlogPost;
 import org.myjerry.evenstar.model.Comment;
 import org.myjerry.evenstar.service.BlogPostService;
+import org.myjerry.evenstar.service.BlogPreferenceService;
 import org.myjerry.evenstar.service.BlogService;
 import org.myjerry.evenstar.service.CommentService;
 import org.myjerry.util.GAEUserUtil;
@@ -28,6 +31,9 @@ public class PostCommentController extends MultiActionController {
 	@Autowired
 	private BlogPostService blogPostService;
 	
+	@Autowired
+	private BlogPreferenceService blogPreferenceService;
+	
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView mav = new ModelAndView();
 
@@ -37,7 +43,9 @@ public class PostCommentController extends MultiActionController {
 
 		Blog blog = this.blogService.getBlog(StringUtils.getLong(blogID));
 		BlogPost post = this.blogPostService.getPost(StringUtils.getLong(postID), StringUtils.getLong(blogID));
-		Collection<Comment> comments = this.commentService.getCommentsForPost(StringUtils.getLong(postID), StringUtils.getLong(blogID), 20);
+		Collection<Comment> comments = this.commentService.getPublishedCommentsForPost(StringUtils.getLong(postID), StringUtils.getLong(blogID), 20);
+		
+		CommentModerationType moderation = CommentModerationType.getModeration(this.blogPreferenceService.getPreference(StringUtils.getLong(blogID), BlogPreferenceConstants.commentModeration));
 		
 		mav.addObject("postID", postID);
 		mav.addObject("blogID", blogID);
@@ -46,6 +54,7 @@ public class PostCommentController extends MultiActionController {
 		mav.addObject("parentID", parentID);
 		mav.addObject("comments", comments);
 		mav.addObject("numComments", comments.size());
+		mav.addObject("moderation", moderation);
 		
 		mav.setViewName(".post.comments");
 		return mav;
@@ -74,14 +83,18 @@ public class PostCommentController extends MultiActionController {
 			comment.setPermissions(Comment.PRIVACY_MODE_PUBLIC);
 		}
 		
+		CommentModerationType moderation = CommentModerationType.getModeration(this.blogPreferenceService.getPreference(StringUtils.getLong(blogID), BlogPreferenceConstants.commentModeration));
+		
 		boolean result = this.commentService.postComment(comment);
 		if(!result) {
 			mav = view(request, response);
 			mav.addObject("thoughts", thoughts);
 		}
 		
+		mav.addObject("moderation", moderation);
 		mav.addObject("postURL", postURL);
 		mav.addObject("result", new Boolean(result));
+
 		mav.setViewName(".post.comments");
 		return mav;
 	}
@@ -132,6 +145,20 @@ public class PostCommentController extends MultiActionController {
 	 */
 	public void setBlogPostService(BlogPostService blogPostService) {
 		this.blogPostService = blogPostService;
+	}
+
+	/**
+	 * @return the blogPreferenceService
+	 */
+	public BlogPreferenceService getBlogPreferenceService() {
+		return blogPreferenceService;
+	}
+
+	/**
+	 * @param blogPreferenceService the blogPreferenceService to set
+	 */
+	public void setBlogPreferenceService(BlogPreferenceService blogPreferenceService) {
+		this.blogPreferenceService = blogPreferenceService;
 	}
 	
 }

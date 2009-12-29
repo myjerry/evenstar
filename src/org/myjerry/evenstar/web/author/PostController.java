@@ -29,14 +29,16 @@ public class PostController extends MultiActionController {
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView mav = new ModelAndView();
 		
-		Long postID = Long.parseLong(request.getParameter("postID"));
-		Long blogID = Long.parseLong(request.getParameter("blogID"));
+		Long postID = StringUtils.getLong(request.getParameter("postID"));
+		Long blogID = StringUtils.getLong(request.getParameter("blogID"));
 		BlogPost post = this.blogPostService.getPost(postID, blogID);
 
 		mav.addObject("post", post);
 		mav.addObject("blogID", blogID);
 		mav.addObject("postID", postID);
-		mav.addObject("privacyMode", post.getPrivacyMode());
+		if(post != null) {
+			mav.addObject("privacyMode", post.getPrivacyMode());
+		}
 		mav.setViewName(".author.newpost");
 		
 		return mav;

@@ -3,6 +3,7 @@ package org.myjerry.evenstar.view;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.myjerry.evenstar.helper.LabelServiceHelper;
 import org.myjerry.evenstar.model.BlogPost;
 
 public class BlogPostInfo {
@@ -51,6 +52,8 @@ public class BlogPostInfo {
 		this.body = post.getContents();
 		this.author = post.getLastUpdateUser();
 		this.blogID = post.getBlogID();
+		
+		this.labels = LabelServiceHelper.getLabels(post.getLabels());
 		
 		SimpleDateFormat formatter = new SimpleDateFormat(dateHeaderFormat);
 		this.timestamp = formatter.format(post.getPostedDate());

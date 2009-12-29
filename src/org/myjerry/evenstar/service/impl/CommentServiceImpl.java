@@ -7,13 +7,18 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.myjerry.evenstar.constants.BlogPreferenceConstants;
+import org.myjerry.evenstar.enums.CommentModerationType;
 import org.myjerry.evenstar.model.AutoApprovedCommentor;
 import org.myjerry.evenstar.model.BannedCommentor;
 import org.myjerry.evenstar.model.Comment;
+import org.myjerry.evenstar.model.RejectedComment;
 import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
+import org.myjerry.evenstar.service.BlogPreferenceService;
 import org.myjerry.evenstar.service.CommentService;
 import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -24,7 +29,10 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 
 public class CommentServiceImpl implements CommentService {
-
+	
+	@Autowired
+	private BlogPreferenceService blogPreferenceService;
+	
 	@Override
 	public boolean deleteComment(Long commentID, Long postID, Long blogID) {
 		// verify if blog id and post id are in match and comment is for the same blog and post
@@ -75,16 +83,16 @@ public class CommentServiceImpl implements CommentService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<Comment> getCommentsForPost(Long postID, Long blogID, int count) {
+	public Collection<Comment> getPublishedCommentsForPost(Long postID, Long blogID, int count) {
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		Query query = manager.newQuery(Comment.class);
-	    query.setFilter("postID == postIDParam && blogID == blogIDParam");
+	    query.setFilter("postID == postIDParam && blogID == blogIDParam && published == publishedParam");
 	    query.setOrdering("timestamp desc");
-	    query.declareParameters("String postIDParam, String blogIDParam");
+	    query.declareParameters("Long postIDParam, Long blogIDParam, Boolean publishedParam");
 		query.setRange(0, count);
 		
 	    try {
-	    	List<Comment> comments = (List<Comment>) query.execute(postID, blogID);
+	    	List<Comment> comments = (List<Comment>) query.execute(postID, blogID, true);
 	    	if(comments != null) {
 	    		// take care of a GAE Bug
 	    		for(Comment comment : comments) {
@@ -116,13 +124,25 @@ public class CommentServiceImpl implements CommentService {
 	@Override
 	public boolean postComment(Comment comment) {
 		// check whether post id, blog id, and if parent id are all from the same post-blog combination
-		
+
 		// if all is good - persist them in the database
 		comment.setTimestamp(ServerUtils.getServerDate());
+		comment.setPublished(false);
+
+		CommentModerationType moderation = CommentModerationType.getModeration(this.blogPreferenceService.getPreference(comment.getBlogID(), BlogPreferenceConstants.commentModeration));
+		if(moderation == CommentModerationType.NEVER) {
+			comment.setPublished(true);
+		}
 		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		try {
 			manager.makePersistent(comment);
+			
+			// moderate this comment
+			if(moderation != CommentModerationType.NEVER) {
+				// for auto approved commentors
+				moderateComment(moderation, comment.getBlogID(), comment.getCommentID());
+			}
 			
 			return true;
 		} catch(Exception e) {
@@ -133,14 +153,38 @@ public class CommentServiceImpl implements CommentService {
 		return false;
 	}
 
+	private void moderateComment(CommentModerationType moderation, Long blogID, Long commentID) {
+		// check and moderate this comment for auto approved commentors
+		
+		// or for admin users
+		
+		// or if the post type is older
+	}
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean publishComment(Long commentID, Long postID, Long blogID) {
-		// verify if blog and post both have comments enabled
-		
-		// verify if comment is for the same blog and post
-		
-		// check if comment has not been deleted
-		
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Query query = manager.newQuery(Comment.class, "commentID == commentIDParam && postID == postIDParam && blogID == blogIDParam && published == publishedParam");
+			query.declareParameters("Long commentIDParam, Long postIDParam, Long blogIDParam, Boolean publishedParam");
+			
+			List<Comment> comments = (List<Comment>) query.executeWithArray(commentID, postID, blogID, false);
+			if(comments != null && comments.size() > 0) {
+				for(Comment comment : comments) {
+					if(comment.getDeleted() != null && (comment.getDeleted() != true)) {
+						comment.setPublished(true);
+						manager.makePersistent(comment);
+					}
+				}
+				
+				return true;
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
 		return false;
 	}
 
@@ -164,13 +208,14 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public int getTotalCommentsOnPost(Long postID, Long blogID) {
+	public int getTotalPublishedCommentsOnPost(Long postID, Long blogID) {
 		DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
 
 		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(Comment.class.getSimpleName());
 		query.setKeysOnly();
 		query.addFilter("blogID", FilterOperator.EQUAL, blogID);
 		query.addFilter("postID", FilterOperator.EQUAL, postID);
+		query.addFilter("published", FilterOperator.EQUAL, true);
 		FetchOptions fetchOptions = FetchOptions.Builder.withOffset(0).limit(Integer.MAX_VALUE);
 		PreparedQuery preparedQuery = datastoreService.prepare(query);
 		int size = preparedQuery.asList(fetchOptions).size();
@@ -374,6 +419,97 @@ public class CommentServiceImpl implements CommentService {
 	    	manager.close();
 	    }
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Long getNumUnpublishedCommentsForBlog(Long blogID) {
+		if(blogID != null) {
+			PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+			Query query = manager.newQuery(Comment.class, "blogID == blogIDParam && published != publishedParam");
+			query.declareParameters("Long blogIDParam, Boolean publishedParam");
+			
+			try {
+				List<Comment> comments = (List<Comment>) query.execute(blogID, new Boolean(true));
+				if(comments != null) {
+					int size = comments.size();
+					return new Long(size);
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			} finally {
+				manager.close();
+			}
+		}
+		
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<Comment> getUnpublishedCommentsForBlog(Long blogID) {
+		if(blogID != null) {
+			PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+			Query query = manager.newQuery(Comment.class, "blogID == blogIDParam && published == publishedParam");
+			query.declareParameters("Long blogIDParam, Boolean publishedParam");
+			
+			try {
+				List<Comment> comments = (List<Comment>) query.execute(blogID, new Boolean(false));
+				return manager.detachCopyAll(comments);
+			} catch(Exception e) {
+				e.printStackTrace();
+			} finally {
+				manager.close();
+			}
+		}
+		
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean rejectComment(Long commentID, Long postID, Long blogID) {
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Query query = manager.newQuery(Comment.class, "commentID == commentIDParam && postID == postIDParam && blogID == blogIDParam && published == publishedParam");
+			query.declareParameters("Long commentIDParam, Long postIDParam, Long blogIDParam, Boolean publishedParam");
+			
+			List<Comment> comments = (List<Comment>) query.executeWithArray(commentID, postID, blogID, false);
+			if(comments != null && comments.size() > 0) {
+				for(Comment comment : comments) {
+					if(comment.getDeleted() == null || comment.getDeleted() == false) {
+						RejectedComment rejectedComment = new RejectedComment(comment);
+						
+						// TODO: do this in a transaction
+						manager.deletePersistent(comment);
+						manager.makePersistent(rejectedComment);
+					}
+				}
+				
+				return true;
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
+		return false;
+	}
+	
+	// Usual accessors follow
+	
+	/**
+	 * @return the blogPreferenceService
+	 */
+	public BlogPreferenceService getBlogPreferenceService() {
+		return blogPreferenceService;
+	}
+
+	/**
+	 * @param blogPreferenceService the blogPreferenceService to set
+	 */
+	public void setBlogPreferenceService(BlogPreferenceService blogPreferenceService) {
+		this.blogPreferenceService = blogPreferenceService;
 	}
 
 }

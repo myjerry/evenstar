@@ -1,10 +1,7 @@
 package org.myjerry.evenstar.web.blog;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,21 +10,17 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.myjerry.evenstar.constants.BlogPreferenceConstants;
-import org.myjerry.evenstar.helper.ViewPostHelper;
+import org.myjerry.evenstar.helper.ControllerHelper;
+import org.myjerry.evenstar.helper.TemplateHelper;
 import org.myjerry.evenstar.model.Blog;
 import org.myjerry.evenstar.model.BlogPost;
 import org.myjerry.evenstar.service.BlogLayoutService;
 import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.evenstar.service.BlogPreferenceService;
 import org.myjerry.evenstar.service.BlogService;
-import org.myjerry.evenstar.service.CommentService;
-import org.myjerry.evenstar.service.BlogUserService;
-import org.myjerry.evenstar.view.BlogInfo;
-import org.myjerry.evenstar.view.BlogPostInfo;
-import org.myjerry.util.GAEUserUtil;
+import org.myjerry.evenstar.service.ViewPostService;
 import org.myjerry.util.ServerUtils;
 import org.myjerry.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,16 +39,13 @@ public class BlogHomeController extends MultiActionController {
 	private BlogPostService blogPostService;
 	
 	@Autowired
-	private CommentService commentService;
-	
-	@Autowired
 	private VelocityEngine velocityEngine;
 	
 	@Autowired
 	private BlogLayoutService blogLayoutService;
 	
 	@Autowired
-	private BlogUserService blogUserService;
+	private ViewPostService viewPostService;
 
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		boolean searchMode = false;
@@ -67,7 +57,7 @@ public class BlogHomeController extends MultiActionController {
 		}
 		
 		ModelAndView mav = new ModelAndView();
-		Long blogID = ViewPostHelper.convertToBlogID(request, this.blogService);
+		Long blogID = ControllerHelper.convertToBlogID(request, this.blogService);
 		
 		if(blogID == null) {
 			mav.setViewName(".evenstar");
@@ -97,24 +87,6 @@ public class BlogHomeController extends MultiActionController {
 			}
 			
 			List<BlogPost> posts = new ArrayList<BlogPost>(postsCollection);
-			// this collection is sorted chronologically
-			// sort in other order
-			Collections.sort(posts, new Comparator<BlogPost>() {
-
-				@Override
-				public int compare(BlogPost o1, BlogPost o2) {
-					if(o1 != null && o2 != null) {
-						return 0 - o1.getPostedDate().compareTo(o2.getPostedDate());
-					} else if(o1 == null && o2 == null) {
-						return 0;
-					} else if(o1 == null) {
-						return 1;
-					}
-					// o2 is null
-					return -1;
-				}
-				
-			});
 
 			if(posts != null && posts.size() > 0) {
 				if(posts.size() > numPosts) {
@@ -133,30 +105,8 @@ public class BlogHomeController extends MultiActionController {
 				}
 			}
 			
-			
-			String dateHeaderFormat = this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.postDateHeaderFormat);
-			
-			Collection<BlogPostInfo> list = new ArrayList<BlogPostInfo>();
-			if(posts != null) {
-				for(BlogPost post : posts) {
-					BlogPostInfo p = ViewPostHelper.getBlogPostInfo(post, dateHeaderFormat, blog.getBlogID(), blog.getRestrictedPostText(), this.blogUserService, this.commentService);
-					list.add(p);
-				}
-			}
-			model.put("blog", new BlogInfo(blog));
-			model.put("title", blog.getTitle());
-			model.put("description", blog.getDescription());
-			model.put("posts", list);
-			model.put("isBlogAdmin", GAEUserUtil.isCurrentUserHost());
-			
-			String template = this.blogLayoutService.getBlogTemplate(blogID);
-			if(StringUtils.isEmpty(template)) {
-				template = this.blogLayoutService.getDefaultBlogTemplate();
-			}
-
-			StringWriter result = new StringWriter();
-			this.velocityEngine.evaluate(new VelocityContext(model), result, "log string", template);
-			String generatedBlogPage = result.toString();
+			model = this.viewPostService.getPostsViewModel(blog, posts, false, model);
+			String generatedBlogPage = TemplateHelper.generateBlogPage(blogID, model, blogLayoutService, velocityEngine);
 			
 			mav.addAllObjects(model);
 			mav.addObject("generatedBlogPage", generatedBlogPage);
@@ -177,6 +127,20 @@ public class BlogHomeController extends MultiActionController {
 	 */
 	public void setBlogService(BlogService blogService) {
 		this.blogService = blogService;
+	}
+
+	/**
+	 * @return the blogPreferenceService
+	 */
+	public BlogPreferenceService getBlogPreferenceService() {
+		return blogPreferenceService;
+	}
+
+	/**
+	 * @param blogPreferenceService the blogPreferenceService to set
+	 */
+	public void setBlogPreferenceService(BlogPreferenceService blogPreferenceService) {
+		this.blogPreferenceService = blogPreferenceService;
 	}
 
 	/**
@@ -222,44 +186,17 @@ public class BlogHomeController extends MultiActionController {
 	}
 
 	/**
-	 * @return the commentService
+	 * @return the viewPostService
 	 */
-	public CommentService getCommentService() {
-		return commentService;
+	public ViewPostService getViewPostService() {
+		return viewPostService;
 	}
 
 	/**
-	 * @param commentService the commentService to set
+	 * @param viewPostService the viewPostService to set
 	 */
-	public void setCommentService(CommentService commentService) {
-		this.commentService = commentService;
+	public void setViewPostService(ViewPostService viewPostService) {
+		this.viewPostService = viewPostService;
 	}
 
-	/**
-	 * @return the blogUserService
-	 */
-	public BlogUserService getBlogUserService() {
-		return blogUserService;
-	}
-
-	/**
-	 * @param blogUserService the blogUserService to set
-	 */
-	public void setBlogUserService(BlogUserService blogUserService) {
-		this.blogUserService = blogUserService;
-	}
-
-	/**
-	 * @return the blogPreferenceService
-	 */
-	public BlogPreferenceService getBlogPreferenceService() {
-		return blogPreferenceService;
-	}
-
-	/**
-	 * @param blogPreferenceService the blogPreferenceService to set
-	 */
-	public void setBlogPreferenceService(BlogPreferenceService blogPreferenceService) {
-		this.blogPreferenceService = blogPreferenceService;
-	}
 }

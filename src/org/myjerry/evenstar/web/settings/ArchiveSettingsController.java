@@ -54,6 +54,10 @@ public class ArchiveSettingsController extends MultiActionController {
 		mav.setViewName(".admin.settings.archives");
 		return mav;
 	}
+	
+	public ModelAndView reBuild(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		return view(request, response);
+	}
 
 	/**
 	 * @return the blogPreferenceService

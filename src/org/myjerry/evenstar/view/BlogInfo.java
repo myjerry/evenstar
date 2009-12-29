@@ -1,8 +1,12 @@
 package org.myjerry.evenstar.view;
 
+import java.util.Date;
+
 import org.myjerry.evenstar.model.Blog;
 
 public class BlogInfo {
+	
+	private Long blogID;
 	
 	private String title;
 	
@@ -17,8 +21,15 @@ public class BlogInfo {
 	private String encoding;
 	
 	private String feedLinks;
+	
+	private Long numPosts;
+	
+	private Long unpublishedComments;
+	
+	private Date lastPublishedDate;
 
 	public BlogInfo(Blog blog) {
+		this.blogID = blog.getBlogID();
 		this.title = blog.getTitle();
 		this.url = blog.getAddress();
 	}
@@ -119,6 +130,62 @@ public class BlogInfo {
 	 */
 	public void setFeedLinks(String feedLinks) {
 		this.feedLinks = feedLinks;
+	}
+
+	/**
+	 * @return the numPosts
+	 */
+	public Long getNumPosts() {
+		return numPosts;
+	}
+
+	/**
+	 * @param numPosts the numPosts to set
+	 */
+	public void setNumPosts(Long numPosts) {
+		this.numPosts = numPosts;
+	}
+
+	/**
+	 * @return the unpublishedComments
+	 */
+	public Long getUnpublishedComments() {
+		return unpublishedComments;
+	}
+
+	/**
+	 * @param unpublishedComments the unpublishedComments to set
+	 */
+	public void setUnpublishedComments(Long unpublishedComments) {
+		this.unpublishedComments = unpublishedComments;
+	}
+
+	/**
+	 * @return the lastPublishedDate
+	 */
+	public Date getLastPublishedDate() {
+		return lastPublishedDate;
+	}
+
+	/**
+	 * @param lastPublishedDate the lastPublishedDate to set
+	 */
+	public void setLastPublishedDate(Date lastPublishedDate) {
+		this.lastPublishedDate = lastPublishedDate;
+	}
+
+	/**
+	 * @return the blogID
+	 */
+	public Long getBlogID() {
+		return blogID;
+	}
+
+	/**
+	 * @param blogID the blogID to set
+	 */
+	public void setBlogID(Long blogID) {
+		this.blogID = blogID;
 	} 
 
 }

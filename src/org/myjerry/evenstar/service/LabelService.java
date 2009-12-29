@@ -2,13 +2,13 @@ package org.myjerry.evenstar.service;
 
 import java.util.Collection;
 
-import org.myjerry.evenstar.model.BlogLabels;
+import org.myjerry.evenstar.model.BlogLabel;
 
 public interface LabelService {
 
-	public Collection<BlogLabels> getBlogLabels(Long blogID);
+	public Collection<BlogLabel> getBlogLabels(Long blogID);
 	
-	public boolean addBlogLabels(Collection<BlogLabels> labels);
+	public boolean addBlogLabels(Collection<BlogLabel> labels);
 	
 	public int getPostsTaggedWithLabel(Long blogID);
 	

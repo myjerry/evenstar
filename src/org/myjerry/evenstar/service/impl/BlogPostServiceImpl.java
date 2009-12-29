@@ -11,6 +11,7 @@ import javax.jdo.Query;
 import org.myjerry.evenstar.model.Blog;
 import org.myjerry.evenstar.model.BlogPost;
 import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
+import org.myjerry.evenstar.service.BlogLabelService;
 import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.evenstar.service.BlogService;
 import org.myjerry.util.GAEUserUtil;
@@ -31,6 +32,9 @@ public class BlogPostServiceImpl implements BlogPostService {
 	
 	@Autowired
 	private BlogService blogService;
+	
+	@Autowired
+	private BlogLabelService blogLabelService;
 	
 	@Override
 	public boolean publishPost(BlogPost blogPost) {
@@ -61,10 +65,16 @@ public class BlogPostServiceImpl implements BlogPostService {
 			if(blogPost.getPostID() == null) {
 				// create a new post
 				manager.makePersistent(blogPost);
+				
+				// update the labels
+				this.blogLabelService.updatePostLabels(blogPost.getBlogID(), blogPost.getPostID(), null, blogPost.getLabels());
 			} else {
 				// this post should be updated
 				Key key = KeyFactory.createKey(BlogPost.class.getSimpleName(), blogPost.getPostID());
 				BlogPost post = manager.getObjectById(BlogPost.class, key);
+
+				String oldLabels = post.getLabels();
+				
 				post.setContents(blogPost.getContents());
 				post.setLabels(blogPost.getLabels());
 				post.setTitle(blogPost.getTitle());
@@ -73,7 +83,10 @@ public class BlogPostServiceImpl implements BlogPostService {
 				post.setLastUpdateUser(blogPost.getLastUpdateUser());
 				post.setPostedDate(blogPost.getPostedDate());
 				post.setPrivacyMode(blogPost.getPrivacyMode());
-				
+
+				// update the labels
+				this.blogLabelService.updatePostLabels(blogPost.getBlogID(), blogPost.getPostID(), oldLabels, blogPost.getLabels());
+
 				manager.makePersistent(post);
 			}
 			return true;
@@ -91,7 +104,12 @@ public class BlogPostServiceImpl implements BlogPostService {
 		try {
 			Key key = KeyFactory.createKey(BlogPost.class.getSimpleName(), blogPostID); 
 			BlogPost post = manager.getObjectById(BlogPost.class, key);
+			
 			if(post.getBlogID().equals(blogID)) {
+				// delete labels for post
+				this.blogLabelService.deleteLabelsForPost(post.getBlogID(), post.getPostID(), post.getLabels());
+				
+				// delete the post itself
 				manager.deletePersistent(post);
 				return true;
 			}
@@ -153,7 +171,10 @@ public class BlogPostServiceImpl implements BlogPostService {
 			Key key = KeyFactory.createKey(BlogPost.class.getSimpleName(), blogPostID); 
 			BlogPost post = manager.getObjectById(BlogPost.class, key);
 			if(post.getBlogID().equals(blogID)) {
-				post.setCreationDate(null);
+				post.setPostedDate(null);
+				
+				// delete labels for post
+				this.blogLabelService.deleteLabelsForPost(post.getBlogID(), post.getPostID(), post.getLabels());
 			}
 			return true;
 		} catch(Exception e) {
@@ -180,10 +201,10 @@ public class BlogPostServiceImpl implements BlogPostService {
 			return manager.detachCopyAll(blogs);
 		} catch(Exception e) {
 			e.printStackTrace();
-			return null;
 		} finally {
 			manager.close();
 		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -291,6 +312,10 @@ public class BlogPostServiceImpl implements BlogPostService {
 
 	@Override
 	public BlogPost getPost(Long blogPostID, Long blogID) {
+		if(blogPostID == null || blogID == null) {
+			return null;
+		}
+		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		try {
 			Key key = KeyFactory.createKey(BlogPost.class.getSimpleName(), blogPostID); 
@@ -344,20 +369,6 @@ public class BlogPostServiceImpl implements BlogPostService {
 		return null;
 	}
 
-	/**
-	 * @return the blogService
-	 */
-	public BlogService getBlogService() {
-		return blogService;
-	}
-
-	/**
-	 * @param blogService the blogService to set
-	 */
-	public void setBlogService(BlogService blogService) {
-		this.blogService = blogService;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean isFirstPost(BlogPost post) {
@@ -385,6 +396,62 @@ public class BlogPostServiceImpl implements BlogPostService {
 		    }
 		}
 		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Date getLastPublishedPostDate(Long blogID) {
+		if(blogID == null) {
+			return null;
+		}
+		
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		Query query = manager.newQuery(BlogPost.class, "blogID == blogIDParam && postedDate != null");
+		query.setOrdering("postedDate desc");
+	    query.declareParameters("String blogIDParam");
+	    query.setRange(0, 1);
+	    
+	    try {
+	    	List<BlogPost> posts = (List<BlogPost>) query.execute(blogID);
+	    	if(posts != null && posts.size() == 1) {
+	    		return posts.get(0).getPostedDate();
+	    	}
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	query.closeAll();
+	    	manager.close();
+	    }
+	    
+		return null;
+	}
+
+	/**
+	 * @return the blogService
+	 */
+	public BlogService getBlogService() {
+		return blogService;
+	}
+
+	/**
+	 * @param blogService the blogService to set
+	 */
+	public void setBlogService(BlogService blogService) {
+		this.blogService = blogService;
+	}
+
+	/**
+	 * @return the blogLabelService
+	 */
+	public BlogLabelService getBlogLabelService() {
+		return blogLabelService;
+	}
+
+	/**
+	 * @param blogLabelService the blogLabelService to set
+	 */
+	public void setBlogLabelService(BlogLabelService blogLabelService) {
+		this.blogLabelService = blogLabelService;
 	}
 
 }

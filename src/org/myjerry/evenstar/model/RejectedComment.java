@@ -11,11 +11,7 @@ import javax.jdo.annotations.PrimaryKey;
 import com.google.appengine.api.datastore.Text;
 
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
-public class Comment {
-	
-	public static final int PRIVACY_MODE_PUBLIC = 1;
-	
-	public static final int PRIVACY_MODE_PRIVATE = 2;
+public class RejectedComment {
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -40,13 +36,17 @@ public class Comment {
 	private Integer permissions;
 	
 	@Persistent
-	private Boolean deleted = false;
-	
-	@Persistent
 	private Long parentID;
 	
-	@Persistent
-	private Boolean published = false;
+	public RejectedComment(Comment comment) {
+		this.postID = comment.getPostID();
+		this.blogID = comment.getBlogID();
+		this.setContent(comment.getContent());
+		this.authorID = comment.getAuthorID();
+		this.timestamp = comment.getTimestamp();
+		this.permissions = comment.getPermissions();
+		this.parentID = comment.getParentID();
+	}
 
 	/**
 	 * @return the commentID
@@ -150,20 +150,6 @@ public class Comment {
 	}
 
 	/**
-	 * @return the deleted
-	 */
-	public Boolean getDeleted() {
-		return deleted;
-	}
-
-	/**
-	 * @param deleted the deleted to set
-	 */
-	public void setDeleted(Boolean deleted) {
-		this.deleted = deleted;
-	}
-
-	/**
 	 * @return the parentID
 	 */
 	public Long getParentID() {
@@ -176,19 +162,5 @@ public class Comment {
 	public void setParentID(Long parentID) {
 		this.parentID = parentID;
 	}
-
-	/**
-	 * @return the published
-	 */
-	public Boolean getPublished() {
-		return published;
-	}
-
-	/**
-	 * @param published the published to set
-	 */
-	public void setPublished(Boolean published) {
-		this.published = published;
-	}
-
+	
 }

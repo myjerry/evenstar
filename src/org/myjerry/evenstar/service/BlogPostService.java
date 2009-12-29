@@ -35,4 +35,6 @@ public interface BlogPostService {
 	
 	public boolean isFirstPost(BlogPost post);
 
+	public Date getLastPublishedPostDate(Long blogID);
+
 }

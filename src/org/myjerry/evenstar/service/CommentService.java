@@ -16,7 +16,7 @@ public interface CommentService {
 	
 	public Comment getComment(Long commentID, Long postID, Long blogID);
 	
-	public Collection<Comment> getCommentsForPost(Long postID, Long blogID, int count);
+	public Collection<Comment> getPublishedCommentsForPost(Long postID, Long blogID, int count);
 
 	public Collection<Comment> getAllUnpublishedComments();
 	
@@ -24,7 +24,7 @@ public interface CommentService {
 	
 	public boolean postHasComment(Long commentID, Long postID, Long blogID);
 	
-	public int getTotalCommentsOnPost(Long postID, Long blogID);
+	public int getTotalPublishedCommentsOnPost(Long postID, Long blogID);
 	
 	public boolean addAutoApproveCommentor(String emailAddress, Long blogID);
 	
@@ -41,5 +41,11 @@ public interface CommentService {
 	public Collection<BannedCommentor> getAutoRejectCommentors(Long blogID);
 	
 	public boolean existsAutoRejectCommentor(String emailAddress, Long blogID);
+
+	public Long getNumUnpublishedCommentsForBlog(Long blogID);
+
+	public Collection<Comment> getUnpublishedCommentsForBlog(Long blogID);
+
+	public boolean rejectComment(Long commentID, Long postID, Long blogID);
 	
 }

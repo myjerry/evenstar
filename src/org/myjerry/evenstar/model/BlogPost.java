@@ -54,6 +54,16 @@ public class BlogPost {
 	
 	@Persistent
 	private String lastUpdateUser;
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null || !(obj instanceof BlogPost)) {
+			return false;
+		}
+		
+		BlogPost o2 = (BlogPost) obj;
+		return this.postID.equals(o2.postID);
+	}
 
 	/**
 	 * @return the postID

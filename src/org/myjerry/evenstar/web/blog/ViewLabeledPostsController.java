@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.app.VelocityEngine;
-import org.myjerry.evenstar.helper.ViewPostHelper;
+import org.myjerry.evenstar.helper.ControllerHelper;
 import org.myjerry.evenstar.service.BlogLayoutService;
 import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.evenstar.service.BlogPreferenceService;
@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
-public class PostSearchController extends MultiActionController {
+public class ViewLabeledPostsController extends MultiActionController {
 	
 	@Autowired
 	private BlogService blogService;
@@ -39,12 +39,19 @@ public class PostSearchController extends MultiActionController {
 	private BlogUserService blogUserService;
 	
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Long blogID = ViewPostHelper.convertToBlogID(request, this.blogService);
-		
-		String maxUpdated = request.getParameter("updated-max");
-		String maxResults = request.getParameter("max-results");
+		Long blogID = ControllerHelper.convertToBlogID(request, this.blogService);
+		String label = request.getParameter("label");
+		String older = request.getParameter("older");
+		String newer = request.getParameter("newer");
 		
 		ModelAndView mav = new ModelAndView();
+		
+		if(blogID == null) {
+			mav.setViewName(".evenstar");
+		} else {
+			
+		}
+		mav.setViewName(".evenstar");
 		return mav;
 	}
 

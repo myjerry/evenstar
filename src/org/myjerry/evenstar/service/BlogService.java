@@ -28,4 +28,4 @@ public interface BlogService {
 
 	public Long getBlogIDForServerName(String serverName);
 	
-	}
+}
