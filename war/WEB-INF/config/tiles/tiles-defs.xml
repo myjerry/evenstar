@@ -172,6 +172,11 @@
 		<put-attribute name="title" value="Import Blog" />
 		<put-attribute name="body" value="/WEB-INF/jsps/tools/importBlog.jsp" />
 	</definition>
+	
+	<definition name=".tools.import.blog.success" extends=".masterLayout">
+		<put-attribute name="title" value="Voilla!" />
+		<put-attribute name="body" value="/WEB-INF/jsps/tools/importBlogSuccess.jsp" />
+	</definition>
 
 	<definition name=".tools.export.blog" extends=".masterLayout">
 		<put-attribute name="title" value="Export Blog" />

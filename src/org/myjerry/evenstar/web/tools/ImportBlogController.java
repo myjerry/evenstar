@@ -33,7 +33,18 @@ public class ImportBlogController extends MultiActionController {
 		if(uploadBean.getBlogXMLFile() != null) {
 			String blog = new String(uploadBean.getBlogXMLFile().getBytes());
 			Long blogID = StringUtils.getLong(request.getParameter("blogID"));
-			this.blogService.importBlog(blogID, BlogImportType.BLOGGER, blog, true);
+			boolean success = false;
+			try {
+				this.blogService.importBlog(blogID, BlogImportType.BLOGGER, blog, true);
+				success = true;
+			} catch(Throwable t) {
+				mav.addObject("importErrors", t);
+			}
+			
+			if(success) {
+				mav.setViewName(".tools.import.blog.success");
+				return mav;
+			}
 		}
 		
 		mav.setViewName(".tools.import.blog");
