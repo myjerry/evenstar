@@ -40,7 +40,11 @@
 	<bean name="exceptionResolver" class="org.myjerry.web.controller.MyJerryExceptionResolver" >
 		<property name="order" value="0" />
 	</bean> -->
-	
+
+	<bean id="multipartResolver" class="org.myjerry.web.multipart.StreamingMultipartResolver">
+		<property name="maxUploadSize" value="1000000" />
+	</bean>
+  	
 	<bean name="urlTilenameController" class="org.springframework.web.servlet.mvc.UrlTilenameViewController" >
 		<property name="indexTile" value=".homePage" />
 		<property name="toLowercase" value="true" />
