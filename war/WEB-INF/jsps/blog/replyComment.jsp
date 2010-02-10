@@ -53,7 +53,21 @@
 					</div>
 					<label>You may use some HTML tags &lt;b&gt;, &lt;i&gt;, &lt;a&gt;</label>
 				</div>
-	
+
+				<div class="form-row">
+					<label>Privacy</label>
+					<div class="form-row-input">
+						<c:if test="${((null eq comment.permissions) or (1 == comment.permissions))}">
+							<input type="radio" value="public" name="privacy" checked="checked" disabled="disabled" /><label>Public</label>
+							<input type="radio" value="private" name="privacy" disabled="disabled" /><label>Private</label>
+						</c:if>
+						<c:if test="${(2 == comment.permissions)}">
+							<input type="radio" value="public" name="privacy" disabled="disabled" /><label>Public</label>
+							<input type="radio" value="private" name="privacy" checked="checked" disabled="disabled" /><label>Private</label>
+						</c:if>
+					</div>
+				</div>
+
 				<div class="form-row">
 					<label>Comment Moderation has been enabled by the author. All comments must be approved by the blog author before they appear on the post.</label>
 				</div>

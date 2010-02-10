@@ -2,57 +2,127 @@
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c"%>
 <%@ page isELIgnored="false" %>
 
-This is the formatting page.
-
-<a href="/admin/settings.html">Basic</a>
-<a href="/admin/settings/format.html">Formatting</a>
-<a href="/admin/settings/comments.html">Comments</a>
-<a href="/admin/settings/archives.html">Archiving</a>
-<a href="/admin/settings/feed.html">Site Feed</a>
-<a href="/admin/settings/email.html">Email</a>
-<a href="/admin/settings/openID.html">OpenID</a>
-<a href="/admin/settings/security.html">Permissions</a>
-<a href="/admin/settings/tools.html">Tools</a>
+<script type="text/javascript">
+  function submitForm(name) {
+    document.getElementById('actionParam').value = name;
+    document.evenstarForm.submit();
+  }
+</script>
 
 <div class="form">
-	<form name="basicSettingsForm" method="POST" >
+	<form name="evenstarForm" method="POST" >
 	
-		<input id="actionParam" name="_action" value="submit" type="hidden" />
+		<input id="actionParam" name="_action" type="hidden" />
 		<input name="blogID" value="${blogID}" type="hidden" />
 		
+		<div class="tabs" style="width: 826px;">
+			<table cellpadding="0" cellspacing="0" border="0">
+				<tr>
+					<td class="first">
+						<div class="tab on">
+							<div>
+								<a href="/admin/settings.html?blogID=${blogID}">Basic</a>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div class="tab">
+							<div>
+								<a href="/admin/settings/format.html?blogID=${blogID}">Formatting</a>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div class="tab">
+							<div>
+								<a href="/admin/settings/comments.html?blogID=${blogID}">Comments</a>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div class="tab">
+							<div>
+								<a href="/admin/settings/archives.html?blogID=${blogID}">Archiving</a>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div class="tab">
+							<div>
+								<a href="/admin/settings/feed.html?blogID=${blogID}">Site Feed</a>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div class="tab">
+							<div>
+								<a href="/admin/settings/email.html?blogID=${blogID}">Email</a>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div class="tab">
+							<div>
+								<a href="/admin/settings/openID.html?blogID=${blogID}">OpenID</a>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div class="tab">
+							<div>
+								<a href="/admin/settings/security.html?blogID=${blogID}">Permissions</a>
+							</div>
+						</div>
+					</td>
+					<td class="last">
+						<div class="tab">
+							<div>
+								<a href="/admin/settings/tools.html?blogID=${blogID}">Tools</a>
+							</div>
+						</div>
+					</td>
+
+					<td class="brdr-right">
+						<div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+      
+		<br />
+		
 		<div class="contain">
+		
+			<h2>Make your blog look the way you like</h2>
 		
 			<div class="form-row">
 				<label>Show</label>
 				<div class="form-row-input">
-					<input name="numPosts" maxlength="2" size="2" />
-					<select name="postingType">
-						<option value="posts">posts</option>
-						<option value="days">days</option>
-					</select>
+					<input name="numPosts" maxlength="2" size="10" value="${numPosts}" /> &nbsp; posts on the main page.
 				</div>
 			</div>
 
 			<div class="form-row">
 				<label>Date Header Format</label>
 				<div class="form-row-input">
-					<select name="dateHeaderType">
+					<select name="dateHeaderFormat">
+						<c:forEach items="${dateHeaderFormats}" var="headerFormat">
+							<c:if test="${dateHeaderFormat == headerFormat.key}">
+								<option value="${headerFormat.key}" selected="selected">${headerFormat.value}</option>
+							</c:if>
+							<c:if test="${dateHeaderFormat != headerFormat.key}">
+								<option value="${headerFormat.key}" >${headerFormat.value}</option>
+							</c:if>
+						</c:forEach>
 					</select>
 				</div>
 			</div>
 			
 			<div class="form-row">
-				<label>Archive Index Date</label>
-				<div class="form-row-input">
-					<select name="archiveIndexDate">
-					</select>
-				</div>
-			</div>
-
-			<div class="form-row">
 				<label>Timestamp Format</label>
 				<div class="form-row-input">
-					<select name="archiveIndexDate">
+					<select name="postTimeStampFormat">
 					</select>
 				</div>
 			</div>
@@ -60,7 +130,7 @@ This is the formatting page.
 			<div class="form-row">
 				<label>Time Zone</label>
 				<div class="form-row-input">
-					<select name="archiveIndexDate">
+					<select name="postTimeZoneFormat">
 					</select>
 				</div>
 			</div>
@@ -68,7 +138,9 @@ This is the formatting page.
 			<div class="form-row">
 				<label>Convert line breaks</label>
 				<div class="form-row-input">
-					<select name="archiveIndexDate">
+					<select name="convertLineBreaks">
+						<option value="yes">Yes</option>
+						<option value="no">No</option>
 					</select>
 				</div>
 			</div>
@@ -76,11 +148,20 @@ This is the formatting page.
 			<div class="form-row">
 				<label>Post Template</label>
 				<div class="form-row-input">
-					<textarea name="postTemplate" rows="5" cols="50"></textarea>
+					<textarea name="postTemplate" rows="5" cols="50" class="averageTextArea" >${postTemplate}</textarea>
 				</div>
 			</div>
+			
+			<div style="clear: both;"></div>
 
 		</div>
+
+		<div class="button-bar">
+			<div class="region">
+				<a href="javascript:submitForm('update');" class="form-control">Update</a>
+				<a href="/admin.html" class="form-control">Cancel</a>
+			</div>
+		</div>        
 	
 	</form>
 </div>

@@ -23,16 +23,6 @@
 	
 	You have chosen to delete the following comment:
 	
-	<br />
-	<br />
-	<div id="commentWrapper">
-		<div id="comment">
-			${comment.content}
-			<br />
-			- commented by ${comment.authorID} on ${comment.timestamp}
-		</div>
-	</div>
-	
 	<div class="form">
 		<form name="commentForm" method="POST" >
 		
@@ -41,6 +31,18 @@
 			<input name="postID" value="${postID}" type="hidden" />
 			<input name="commentID" value="${commentID}" type="hidden" />
 			<input name="postURL" value="${post.url}" type="hidden" />
+			
+			<div class="contain">
+			
+				<h2>${comment.authorID} on ${comment.timestamp}</h2>
+				
+				<p class="instructions">
+					${comment.content}
+				</p>
+				
+				<div style="clear: both;"></div>
+			
+			</div>
 			
 			<div class="button-bar">
 				<div class="region">

@@ -2,9 +2,9 @@
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c"%>
 <%@ page isELIgnored="false" %>
 
-<h1>Create a New Blog</h1>
+<h2 class="workflow">Create a New Blog</h2>
 
-<h3>Owner: <mj:gae.user /> </h3>
+<div style="clear:both;"></div>
 
 <c:if test="${not empty validationErrors}" >
 	<ul>
@@ -17,21 +17,30 @@
 <div class="form">
 	<form name="createBlogForm" method="POST">
 	
-		<input name="_action" value="submit" type="hidden" />
-		
+		<input id="actionParam" name="_action" value="submit" type="hidden" />
+	
 		<div class="contain">
-		
+
+			<h2>Owner: <mj:gae.user /> </h2>
+					
 			<div class="form-row">
 				<label>Blog Title</label>
 				<div class="form-row-input">
-					<input name="blogTitle" maxlength="50" />
+					<input name="blogTitle" maxlength="100" size="100" />
 				</div>
 			</div>
 	
 			<div class="form-row">
-				<label>Blog Address</label>
+				<label>Blog URL</label>
 				<div class="form-row-input">
-					<input name="blogAddress" maxlength="50" />
+					<input name="blogAddress" maxlength="100" size="100" />
+				</div>
+			</div>
+
+			<div class="form-row">
+				<label>Blog Alias</label>
+				<div class="form-row-input">
+					<input name="blogAlias" maxlength="100" size="100" />
 				</div>
 			</div>
 	
@@ -41,6 +50,8 @@
 					<input name="captcha" maxlength="50" />
 				</div>
 			</div>
+			
+			<div style="clear: both;"></div>
 
 		</div>		
 

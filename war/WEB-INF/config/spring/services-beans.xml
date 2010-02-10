@@ -3,7 +3,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
 		  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
 
-<beans>
+<beans default-autowire="byName">
 
 	<bean name="blogService" class="org.myjerry.evenstar.service.impl.BlogServiceImpl" >
 		<property name="preferenceService" ref="preferenceService" />
@@ -11,13 +11,16 @@
 	
 	<bean name="blogPostService" class="org.myjerry.evenstar.service.impl.BlogPostServiceImpl" >
 		<property name="blogService" ref="blogService" />
+		<property name="blogLabelService" ref="blogLabelService" />
 	</bean>
 	
 	<bean name="preferenceService" class="org.myjerry.evenstar.service.impl.PreferenceServiceImpl" />
 	
 	<bean name="blogPreferenceService" class="org.myjerry.evenstar.service.impl.BlogPreferenceServiceImpl" />
 
-	<bean name="commentService" class="org.myjerry.evenstar.service.impl.CommentServiceImpl" />
+	<bean name="commentService" class="org.myjerry.evenstar.service.impl.CommentServiceImpl" >
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
 	
 	<bean name="feedService" class="org.myjerry.evenstar.service.impl.FeedServiceImpl" />
 	
@@ -31,6 +34,16 @@
 		<property name="preferFileSystemAccess" value="false" />
 	</bean>
 	
-	<bean name="blogUserService" class="org.myjerry.evenstar.service.impl.BlogUserServiceImpl" />	
+	<bean name="blogUserService" class="org.myjerry.evenstar.service.impl.BlogUserServiceImpl" />
+	
+	<bean name="blogArchiveService" class="org.myjerry.evenstar.service.impl.BlogArchiveServiceImpl" >
+		<property name="blogPreferenceService" ref="blogPreferenceService" />
+	</bean>
+	
+	<bean name="blogLabelService" class="org.myjerry.evenstar.service.impl.BlogLabelServiceImpl" />
+	
+	<bean name="viewPostService" class="org.myjerry.evenstar.service.impl.ViewPostServiceImpl" />
+	
+	<bean name="userService" class="org.myjerry.evenstar.service.impl.UserServiceImpl" />
 
 </beans>

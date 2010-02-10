@@ -2,6 +2,10 @@
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c"%>
 <%@ page isELIgnored="false" %>
 
+<h2 class="workflow">Delete Post?</h2>
+ 
+<div style="clear:both;"></div>
+
 <div class="form">
 	<form name="deletePostForm" method="POST" action="/author/deletePost.html">
 	
@@ -10,14 +14,13 @@
 		<input name="postID" value="${postID}" type="hidden" />
 		
 		<div class="contain">
-		
-			<h1>Are you sure you want to delete this post?</h1>
+			<h2>Are you sure you want to delete this post?</h2>
 			
-			<hr />
+			<p class="instructions">
+				${post.contents}
+			</p>
 			
-			<p>${post.contents}</p>
-
-			<hr />
+			<div style="clear: both;"></div>
 			
 		</div>		
 

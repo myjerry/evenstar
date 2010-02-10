@@ -11,14 +11,9 @@
   }
 </script>
 
-<h5>Current Default Blog:
-	<c:if test="${not empty defaultBlog}">
-		${defaultBlog.title}
-	</c:if>
-	<c:if test="${empty defaultBlog}">
-		None
-	</c:if>
-</h5>
+<h2 class="workflow">Set up which thought stream user's get to see as default!</h2>
+
+<div style="clear:both;"></div>
 
 <c:if test="${not empty blogs}">
 	<div class="form">
@@ -28,6 +23,16 @@
 			<input id="blogIDParam" name="blogID" type="hidden" />
 			
 			<div class="contain">
+
+				<h2 class="workflow">
+					Current Default Blog:
+					<c:if test="${not empty defaultBlog}">
+						${defaultBlog.title}
+					</c:if>
+					<c:if test="${empty defaultBlog}">
+						None
+					</c:if>
+				</h2>
 	
 				<c:forEach items="${blogs}" var="blog">
 					<div class="form-row">
@@ -37,6 +42,8 @@
 						</div>
 					</div>
 				</c:forEach>
+				
+				<div style="clear: both;"></div>
 			
 			</div>		
 		

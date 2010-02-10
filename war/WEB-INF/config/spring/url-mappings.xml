@@ -3,13 +3,14 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
 		  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
 
-<beans>
+<beans default-autowire="byName">
 
 	<bean name="urlMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
 		<property name="mappings">
 			<props>
 				<prop key="/index.html">blogHomeController</prop>
 				<prop key="/showPosts.html">blogHomeController</prop>
+				<prop key="/showPostsForLabel.html">viewLabeledPostsController</prop>
 				<prop key="/viewPost.html">viewPostController</prop>
 				
 				<prop key="/noAccess.html">urlTilenameController</prop>
@@ -37,13 +38,20 @@
 				<prop key="/admin/settings/security.html">securitySettingsController</prop>
 				<prop key="/admin/settings/tools.html">toolSettingsController</prop>
 				
+				<prop key="/admin/tools/importBlog.html">importBlogController</prop>
+				<prop key="/admin/tools/exportBlog.html">exportBlogController</prop>
+				<prop key="/admin/tools/deleteBlog.html">deleteBlogController</prop>
+				
 				<prop key="/postComment.html">postCommentController</prop>
 				<prop key="/replyComment.html">replyCommentController</prop>
 				<prop key="/deleteComment.html">deleteCommentController</prop>
+				<prop key="/admin/moderateComments.html">moderateCommentsController</prop>
 				
 				<prop key="/myAccount.html">userAccountController</prop>
 				
 				<prop key="/emailPost.html">emailPostController</prop>
+				
+				<prop key="/openid.html">forwardController</prop>
 				
 				<!-- For all other URIs that do not match, forward the user to a generic Page Not Found page. -->
         		<prop key="/**">pageNotFoundController</prop>
