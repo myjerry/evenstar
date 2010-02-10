@@ -9,9 +9,11 @@ import org.myjerry.evenstar.view.LabelInfo;
 
 public class LabelServiceHelper {
 	
+	private static final String LABEL_DELIMITERS = ";,";
+	
 	public static String[] tokenizeLabels(String labels) {
 		if(labels != null && labels.length() > 0) {
-			return StringUtils.split(labels, " ;,");
+			return StringUtils.split(labels, LABEL_DELIMITERS);
 		}
 		return new String[] { labels };
 	}
@@ -24,7 +26,7 @@ public class LabelServiceHelper {
 	public static List<LabelInfo> getLabels(String labels) {
 		List<LabelInfo> list = new ArrayList<LabelInfo>();
 		if(labels != null && labels.length() > 0) {
-			String tokens[] = StringUtils.split(labels, " ;,");
+			String tokens[] = StringUtils.split(labels, LABEL_DELIMITERS);
 			int length = tokens.length;
 			if(length > 0) {
 				for(int i=0; i < length; i++) {
