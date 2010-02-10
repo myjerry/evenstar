@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.myjerry.evenstar.constants.CalendarConstants;
 import org.myjerry.evenstar.core.ArchiveKey;
 import org.myjerry.evenstar.enums.BlogArchiveFrequency;

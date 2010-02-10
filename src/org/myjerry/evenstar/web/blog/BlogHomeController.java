@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +29,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
 public class BlogHomeController extends MultiActionController {
+	
+	private static final Logger log = Logger.getLogger(BlogHomeController.class.getName());
 	
 	@Autowired
 	private BlogService blogService;
@@ -82,7 +85,12 @@ public class BlogHomeController extends MultiActionController {
 				}
 			}
 			
-			List<BlogPost> posts = new ArrayList<BlogPost>(postsCollection);
+			List<BlogPost> posts = null;
+			if(postsCollection != null) {
+				posts = new ArrayList<BlogPost>(postsCollection);
+			} else {
+				posts = new ArrayList<BlogPost>();
+			}
 
 			if(posts != null && posts.size() > 0) {
 				if(posts.size() > numPosts) {

@@ -35,7 +35,6 @@ public enum CommentModerationType {
 				break;
 				
 			case NEVER:
-			default:
 				value = "never";
 				break;
 		}

@@ -50,7 +50,11 @@ public class BlogPostInfo {
 		this.id = post.getPostID();
 		this.title = post.getTitle();
 		this.body = post.getContents();
-		this.author = post.getLastUpdateUser();
+		if(post.getLastUpdateUser() != null) {
+			this.author = post.getLastUpdateUser().toString();
+		} else {
+			this.author = "";
+		}
 		this.blogID = post.getBlogID();
 		
 		this.labels = LabelServiceHelper.getLabels(post.getLabels());

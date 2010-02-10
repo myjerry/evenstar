@@ -4,15 +4,24 @@ import org.myjerry.evenstar.model.EvenstarUser;
 
 public interface UserService {
 
-	public Long getEvenstarUserID(String userID, String email);
+	public Long getEvenstarUserID(String email);
 	
-	public EvenstarUser getEvenstarUser(String userID, String email);
-
-	public EvenstarUser getEvenstarUser(Long evenstarUserID);
-
-	public boolean isUserAdmin(String userGoogleID);
+	public Long getEvenstarUserIDForUri(String uri);
 	
-	public boolean addAdmin(String userGoogleID);
+	public EvenstarUser getEvenstarUser(String email);
 	
+	public EvenstarUser getEvenstarUserForUri(String uri);
 
+	public EvenstarUser getEvenstarUser(Long userID);
+
+	public boolean isUserAdmin(String email);
+	
+	public boolean isUserAdmin(Long userID);
+	
+	public boolean addAdmin(String email);
+	
+	public boolean addAdmin(Long userID);
+	
+	public boolean addEvenstarUser(EvenstarUser evenstarUser);
+	
 }

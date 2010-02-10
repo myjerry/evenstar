@@ -53,7 +53,13 @@ public class BlogPost {
 	private Date lastUpdated;
 	
 	@Persistent
-	private String lastUpdateUser;
+	private Long lastUpdateUser;
+	
+	/**
+	 * Just an ID that identifies the post import details. Kept for history purposes only.
+	 */
+	@Persistent
+	private String uniqueImportID;
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -169,14 +175,14 @@ public class BlogPost {
 	/**
 	 * @return the lastUpdateUser
 	 */
-	public String getLastUpdateUser() {
+	public Long getLastUpdateUser() {
 		return lastUpdateUser;
 	}
 
 	/**
 	 * @param lastUpdateUser the lastUpdateUser to set
 	 */
-	public void setLastUpdateUser(String lastUpdateUser) {
+	public void setLastUpdateUser(Long lastUpdateUser) {
 		this.lastUpdateUser = lastUpdateUser;
 	}
 
@@ -220,6 +226,20 @@ public class BlogPost {
 	 */
 	public void setPrivacyMode(Integer privacyMode) {
 		this.privacyMode = privacyMode;
+	}
+
+	/**
+	 * @return the uniqueImportID
+	 */
+	public String getUniqueImportID() {
+		return uniqueImportID;
+	}
+
+	/**
+	 * @param uniqueImportID the uniqueImportID to set
+	 */
+	public void setUniqueImportID(String uniqueImportID) {
+		this.uniqueImportID = uniqueImportID;
 	}
 
 }

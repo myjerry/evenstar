@@ -17,6 +17,7 @@ import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
 import org.myjerry.evenstar.service.BlogLabelService;
 import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.evenstar.service.BlogService;
+import org.myjerry.evenstar.service.UserService;
 import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
 import org.myjerry.util.StringUtils;
@@ -40,13 +41,16 @@ public class BlogPostServiceImpl implements BlogPostService {
 	@Autowired
 	private BlogLabelService blogLabelService;
 	
+	@Autowired
+	private UserService userService;
+	
 	@Override
 	public boolean publishPost(BlogPost blogPost) {
 		if(blogPost.getCreationDate() == null) {
 			blogPost.setCreationDate(ServerUtils.getServerDate());
 		}
 		blogPost.setLastUpdated(ServerUtils.getServerDate());
-		blogPost.setLastUpdateUser(GAEUserUtil.getUserID());
+		blogPost.setLastUpdateUser(StringUtils.getLong(GAEUserUtil.getUserID()));
 		if(blogPost.getPostedDate() == null) {
 			blogPost.setPostedDate(ServerUtils.getServerDate());
 		}
@@ -138,7 +142,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 					blogPost.setCreationDate(ServerUtils.getServerDate());
 				}
 				blogPost.setLastUpdated(ServerUtils.getServerDate());
-				blogPost.setLastUpdateUser(GAEUserUtil.getUserID());
+				blogPost.setLastUpdateUser(StringUtils.getLong(GAEUserUtil.getUserID()));
 				
 				manager.makePersistent(blogPost);
 			} else {
@@ -149,7 +153,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 				post.setContents(blogPost.getContents());
 				post.setLabels(blogPost.getLabels());
 				post.setLastUpdated(ServerUtils.getServerDate());
-				post.setLastUpdateUser(GAEUserUtil.getUserID());
+				post.setLastUpdateUser(StringUtils.getLong(GAEUserUtil.getUserID()));
 				post.setTitle(blogPost.getTitle());
 				post.setPrivacyMode(blogPost.getPrivacyMode());
 				
@@ -467,7 +471,8 @@ public class BlogPostServiceImpl implements BlogPostService {
 		} finally {
 			manager.close();
 		}
-		return false;	}
+		return false;	
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -626,5 +631,19 @@ public class BlogPostServiceImpl implements BlogPostService {
 	 */
 	public void setBlogLabelService(BlogLabelService blogLabelService) {
 		this.blogLabelService = blogLabelService;
+	}
+
+	/**
+	 * @return the userService
+	 */
+	public UserService getUserService() {
+		return userService;
+	}
+
+	/**
+	 * @param userService the userService to set
+	 */
+	public void setUserService(UserService userService) {
+		this.userService = userService;
 	}
 }

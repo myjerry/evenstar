@@ -46,7 +46,7 @@ public class Comment {
 	private Long parentID;
 	
 	@Persistent
-	private Boolean published = false;
+	private Date published;
 
 	/**
 	 * @return the commentID
@@ -180,14 +180,14 @@ public class Comment {
 	/**
 	 * @return the published
 	 */
-	public Boolean getPublished() {
+	public Date getPublished() {
 		return published;
 	}
 
 	/**
 	 * @param published the published to set
 	 */
-	public void setPublished(Boolean published) {
+	public void setPublished(Date published) {
 		this.published = published;
 	}
 

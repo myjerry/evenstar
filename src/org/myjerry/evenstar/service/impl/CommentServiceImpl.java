@@ -86,13 +86,13 @@ public class CommentServiceImpl implements CommentService {
 	public Collection<Comment> getPublishedCommentsForPost(Long postID, Long blogID, int count) {
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		Query query = manager.newQuery(Comment.class);
-	    query.setFilter("postID == postIDParam && blogID == blogIDParam && published == publishedParam");
-	    query.setOrdering("timestamp desc");
-	    query.declareParameters("Long postIDParam, Long blogIDParam, Boolean publishedParam");
+	    query.setFilter("postID == postIDParam && blogID == blogIDParam && published != null");
+	    query.setOrdering("published desc");
+	    query.declareParameters("Long postIDParam, Long blogIDParam");
 		query.setRange(0, count);
 		
 	    try {
-	    	List<Comment> comments = (List<Comment>) query.execute(postID, blogID, true);
+	    	List<Comment> comments = (List<Comment>) query.execute(postID, blogID);
 	    	if(comments != null) {
 	    		// take care of a GAE Bug
 	    		for(Comment comment : comments) {
@@ -127,11 +127,10 @@ public class CommentServiceImpl implements CommentService {
 
 		// if all is good - persist them in the database
 		comment.setTimestamp(ServerUtils.getServerDate());
-		comment.setPublished(false);
 
 		CommentModerationType moderation = CommentModerationType.getModeration(this.blogPreferenceService.getPreference(comment.getBlogID(), BlogPreferenceConstants.commentModeration));
 		if(moderation == CommentModerationType.NEVER) {
-			comment.setPublished(true);
+			comment.setPublished(ServerUtils.getServerDate());
 		}
 		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
@@ -166,14 +165,14 @@ public class CommentServiceImpl implements CommentService {
 	public boolean publishComment(Long commentID, Long postID, Long blogID) {
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		try {
-			Query query = manager.newQuery(Comment.class, "commentID == commentIDParam && postID == postIDParam && blogID == blogIDParam && published == publishedParam");
-			query.declareParameters("Long commentIDParam, Long postIDParam, Long blogIDParam, Boolean publishedParam");
+			Query query = manager.newQuery(Comment.class, "commentID == commentIDParam && postID == postIDParam && blogID == blogIDParam && published == null");
+			query.declareParameters("Long commentIDParam, Long postIDParam, Long blogIDParam");
 			
-			List<Comment> comments = (List<Comment>) query.executeWithArray(commentID, postID, blogID, false);
+			List<Comment> comments = (List<Comment>) query.executeWithArray(commentID, postID, blogID);
 			if(comments != null && comments.size() > 0) {
 				for(Comment comment : comments) {
 					if(comment.getDeleted() != null && (comment.getDeleted() != true)) {
-						comment.setPublished(true);
+						comment.setPublished(ServerUtils.getServerDate());
 						manager.makePersistent(comment);
 					}
 				}
@@ -215,7 +214,7 @@ public class CommentServiceImpl implements CommentService {
 		query.setKeysOnly();
 		query.addFilter("blogID", FilterOperator.EQUAL, blogID);
 		query.addFilter("postID", FilterOperator.EQUAL, postID);
-		query.addFilter("published", FilterOperator.EQUAL, true);
+		query.addFilter("published", FilterOperator.NOT_EQUAL, null);
 		FetchOptions fetchOptions = FetchOptions.Builder.withOffset(0).limit(Integer.MAX_VALUE);
 		PreparedQuery preparedQuery = datastoreService.prepare(query);
 		int size = preparedQuery.asList(fetchOptions).size();
@@ -426,11 +425,11 @@ public class CommentServiceImpl implements CommentService {
 	public Long getNumUnpublishedCommentsForBlog(Long blogID) {
 		if(blogID != null) {
 			PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
-			Query query = manager.newQuery(Comment.class, "blogID == blogIDParam && published != publishedParam");
-			query.declareParameters("Long blogIDParam, Boolean publishedParam");
+			Query query = manager.newQuery(Comment.class, "blogID == blogIDParam && published == null");
+			query.declareParameters("Long blogIDParam");
 			
 			try {
-				List<Comment> comments = (List<Comment>) query.execute(blogID, new Boolean(true));
+				List<Comment> comments = (List<Comment>) query.execute(blogID);
 				if(comments != null) {
 					int size = comments.size();
 					return new Long(size);
@@ -450,11 +449,11 @@ public class CommentServiceImpl implements CommentService {
 	public Collection<Comment> getUnpublishedCommentsForBlog(Long blogID) {
 		if(blogID != null) {
 			PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
-			Query query = manager.newQuery(Comment.class, "blogID == blogIDParam && published == publishedParam");
-			query.declareParameters("Long blogIDParam, Boolean publishedParam");
+			Query query = manager.newQuery(Comment.class, "blogID == blogIDParam && published == null");
+			query.declareParameters("Long blogIDParam");
 			
 			try {
-				List<Comment> comments = (List<Comment>) query.execute(blogID, new Boolean(false));
+				List<Comment> comments = (List<Comment>) query.execute(blogID);
 				return manager.detachCopyAll(comments);
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -471,10 +470,10 @@ public class CommentServiceImpl implements CommentService {
 	public boolean rejectComment(Long commentID, Long postID, Long blogID) {
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		try {
-			Query query = manager.newQuery(Comment.class, "commentID == commentIDParam && postID == postIDParam && blogID == blogIDParam && published == publishedParam");
-			query.declareParameters("Long commentIDParam, Long postIDParam, Long blogIDParam, Boolean publishedParam");
+			Query query = manager.newQuery(Comment.class, "commentID == commentIDParam && postID == postIDParam && blogID == blogIDParam && published == null");
+			query.declareParameters("Long commentIDParam, Long postIDParam, Long blogIDParam");
 			
-			List<Comment> comments = (List<Comment>) query.executeWithArray(commentID, postID, blogID, false);
+			List<Comment> comments = (List<Comment>) query.executeWithArray(commentID, postID, blogID);
 			if(comments != null && comments.size() > 0) {
 				for(Comment comment : comments) {
 					if(comment.getDeleted() == null || comment.getDeleted() == false) {

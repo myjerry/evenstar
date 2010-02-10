@@ -2,6 +2,7 @@ package org.myjerry.evenstar.service;
 
 import java.util.Collection;
 
+import org.myjerry.evenstar.enums.BlogImportType;
 import org.myjerry.evenstar.model.Blog;
 
 public interface BlogService {
@@ -27,5 +28,7 @@ public interface BlogService {
 	public boolean updateBlog(Blog blog);
 
 	public Long getBlogIDForServerName(String serverName);
+	
+	public boolean importBlog(Long blogID, BlogImportType importType, String blogData, boolean publishPosts);
 	
 }

@@ -1,17 +1,35 @@
 package org.myjerry.evenstar.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.Transaction;
 
 import org.myjerry.evenstar.constants.PreferenceConstants;
+import org.myjerry.evenstar.enums.BlogImportType;
+import org.myjerry.evenstar.helper.ImportBlogHelper;
 import org.myjerry.evenstar.model.Blog;
+import org.myjerry.evenstar.model.BlogPost;
+import org.myjerry.evenstar.model.Comment;
+import org.myjerry.evenstar.model.EvenstarUser;
+import org.myjerry.evenstar.model.blogimport.AuthorImport;
+import org.myjerry.evenstar.model.blogimport.BlogImport;
+import org.myjerry.evenstar.model.blogimport.CommentImport;
+import org.myjerry.evenstar.model.blogimport.PostImport;
 import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
+import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.evenstar.service.BlogService;
+import org.myjerry.evenstar.service.CommentService;
 import org.myjerry.evenstar.service.PreferenceService;
+import org.myjerry.evenstar.service.UserService;
 import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
 import org.myjerry.util.StringUtils;
@@ -24,6 +42,15 @@ public class BlogServiceImpl implements BlogService {
 	
 	@Autowired
 	private PreferenceService preferenceService;
+	
+	@Autowired
+	private BlogPostService blogPostService;
+	
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
+	private CommentService commentService;
 	
 	@Override
 	public boolean createBlog(String blogName, String blogAddress, String blogAlias) {
@@ -268,6 +295,159 @@ public class BlogServiceImpl implements BlogService {
 			manager.close();
 		}
 		return null;
+	}
+
+	@Override
+	public boolean importBlog(Long blogID, BlogImportType importType, String blogData, boolean publishPosts) {
+		if(blogID == null || StringUtils.isEmpty(blogData)) {
+			return false;
+		}
+		
+		BlogImport blogImport = null; 
+		switch(importType) {
+			case BLOGGER:
+				blogImport = ImportBlogHelper.parseBlogger(blogData);
+				break;
+		}
+		
+		if(blogImport != null) {
+			try {
+				importBlog(blogID, blogImport, publishPosts);
+				return true;
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
+
+	private void importBlog(final Long blogID, BlogImport blogImport, boolean publishPosts) {
+		if(blogID == null || blogImport == null) {
+			return;
+		}
+		
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		
+		// get all authors too - we need them
+		Set<EvenstarUser> authors = new HashSet<EvenstarUser>();
+		for(PostImport postImport : blogImport.getPosts()) {
+			EvenstarUser author = ImportBlogHelper.getEvenstarUser(postImport.getAuthor());
+			if(author != null) {
+				authors.add(author);
+			}
+		}
+		for(CommentImport commentImport : blogImport.getComments()) {
+			EvenstarUser author = ImportBlogHelper.getEvenstarUser(commentImport.getAuthor());
+			if(author != null) {
+				authors.add(author);
+			}
+		}
+		
+		// check if these authors exist - if they do remove them from this list
+		Set<EvenstarUser> unknownAuthors = new HashSet<EvenstarUser>();
+		for(EvenstarUser author : authors) {
+			if(StringUtils.isNotEmpty(author.getHomePage())) {
+				EvenstarUser user = this.userService.getEvenstarUserForUri(author.getHomePage());
+				if(user == null) {
+					unknownAuthors.add(author);
+				}
+			} else if(StringUtils.isNotEmpty(author.getEmail())) {
+				EvenstarUser user = this.userService.getEvenstarUser(author.getEmail());
+				if(user == null) {
+					unknownAuthors.add(author);
+				}
+			}
+		}
+		
+		// start the transaction
+		try {
+			// persist all authors
+			for(EvenstarUser user : unknownAuthors) {
+				this.userService.addEvenstarUser(user);
+			}
+			
+			// re-populate the author IDs in posts
+			List<BlogPost> posts = new ArrayList<BlogPost>();
+			for(PostImport postImport : blogImport.getPosts()) {
+				AuthorImport author = postImport.getAuthor();
+				if(StringUtils.isNotEmpty(author.getUri())) {
+					Long userID = this.userService.getEvenstarUserIDForUri(author.getUri());
+					BlogPost post = ImportBlogHelper.getBlogPost(blogID, postImport);
+					post.setLastUpdateUser(userID);
+					if(!publishPosts) {
+						post.setPostedDate(null);
+					}
+					posts.add(post);
+				}
+			}
+			
+			// persist all posts
+			// we dont persist them together because we want blog labels
+			// to be persisted along too
+			Map<String, Long> postCommentMapping = new HashMap<String, Long>();
+			if(publishPosts) {
+				for(BlogPost post : posts) {
+					this.blogPostService.publishPost(post);
+					postCommentMapping.put(post.getUniqueImportID(), post.getPostID());
+				}
+			} else {
+				for(BlogPost post : posts) {
+					this.blogPostService.saveDraftPost(post);
+					postCommentMapping.put(post.getUniqueImportID(), post.getPostID());
+				}
+			}
+			
+			// re-populate the IDs in comments
+			for(CommentImport commentImport : blogImport.getComments()) {
+				Comment comment = ImportBlogHelper.getComment(blogID, commentImport);
+				comment.setBlogID(blogID);
+				Long postID = postCommentMapping.get(commentImport.getUniquePostID());
+				comment.setPostID(postID);
+				Long userID = this.userService.getEvenstarUserIDForUri(commentImport.getAuthor().getUri());
+				comment.setAuthorID(userID);
+				
+				// set permissions to PUBLIC
+				comment.setPermissions(Comment.PRIVACY_MODE_PUBLIC);
+				
+				// we will make this change later
+				// this.commentService.postComment(comment);
+				manager.makePersistent(comment);
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
+	}
+
+	/**
+	 * @return the blogPostService
+	 */
+	public BlogPostService getBlogPostService() {
+		return blogPostService;
+	}
+
+	/**
+	 * @param blogPostService the blogPostService to set
+	 */
+	public void setBlogPostService(BlogPostService blogPostService) {
+		this.blogPostService = blogPostService;
+	}
+
+	/**
+	 * @return the userService
+	 */
+	public UserService getUserService() {
+		return userService;
+	}
+
+	/**
+	 * @param userService the userService to set
+	 */
+	public void setUserService(UserService userService) {
+		this.userService = userService;
 	}
 
 }
