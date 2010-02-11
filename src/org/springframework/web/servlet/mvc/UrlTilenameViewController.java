@@ -1,7 +1,7 @@
 /**
- * Matrika India Website Code
- * Copyright (C) 2008 Matrika India Development Team
- * http://www.matrika-india.org
+ * myJerry | Evenstar
+ * Copyright (C) 2010 myJerry Development Team
+ * http://www.myjerry.org
  * 
  * The file is licensed under the the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -16,7 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Author: Sandeep Gupta <sandy.pec@gmail.com>
  */
 package org.springframework.web.servlet.mvc;
 
