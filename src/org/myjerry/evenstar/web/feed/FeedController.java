@@ -41,10 +41,11 @@ public class FeedController extends MultiActionController {
 		FeedFormat feedFormat = null;
 		
 		// strip off the 'feeds/' from the URI
-		uri = uri.substring(6);
+		uri = uri.substring(7);
 		int extIndex = uri.lastIndexOf(".");
 		if(extIndex != -1) {
 			String extension = uri.substring(extIndex + 1);
+			uri = uri.substring(0, extIndex);
 			feedFormat = FeedFormat.getFeedFormat(extension);
 		}
 		
@@ -54,18 +55,18 @@ public class FeedController extends MultiActionController {
 			return null;
 		}
 		
-		Long blogID = ControllerHelper.getBlogIDForDomain(request, this.blogService);
+		Long blogID = this.blogService.getBlogIDForServerName(request.getServerName());
 		if(blogID == null) {
 			// try and see if the URI contains the blog ID
 			String alias = uri;
 			int index = uri.indexOf("/");
 			if(index != -1) {
-				alias = uri.substring(0, index - 1);
+				alias = uri.substring(0, index);
 			}
 			Long id = this.blogService.getBlogIDForAlias(alias);
 			if(id != null) {
 				blogID = id;
-				uri = uri.substring(index);
+				uri = uri.substring(index + 1);
 			} else {
 				// just can't do anything now
 				// no feed found
@@ -84,12 +85,12 @@ public class FeedController extends MultiActionController {
 			uri = uri.substring(6);
 			int index = uri.indexOf("/");
 			if(index != -1) {
-				Long postID = StringUtils.getLong(uri.substring(0, index - 1));
+				Long postID = StringUtils.getLong(uri.substring(0, index));
 				if(postID != null) {
-					String feedType = uri.substring(index);
-					if("default".equals(feedType)) {
+					uri = uri.substring(index + 1);
+					if("default".equals(uri)) {
 						return blogPostFeed(blogID, postID);
-					} else if("comments".equals(feedType)) {
+					} else if("comments".equals(uri)) {
 						return blogPostCommentFeed(blogID, postID);
 					}
 				}
