@@ -4,7 +4,7 @@ public class WebUtils {
 	
 	public final static String getUrlStringFromPostTitle(String postTitle) {
 		if(StringUtils.isEmpty(postTitle)) {
-			return null;
+			return StringUtils.EMPTY_STRING;
 		}
 		String url = postTitle.toLowerCase();
 		url = url.replace(' ', '-');

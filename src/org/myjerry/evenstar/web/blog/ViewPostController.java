@@ -8,11 +8,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.app.VelocityEngine;
+import org.myjerry.evenstar.constants.BlogPreferenceConstants;
 import org.myjerry.evenstar.helper.TemplateHelper;
 import org.myjerry.evenstar.model.Blog;
 import org.myjerry.evenstar.model.BlogPost;
 import org.myjerry.evenstar.service.BlogLayoutService;
 import org.myjerry.evenstar.service.BlogPostService;
+import org.myjerry.evenstar.service.BlogPreferenceService;
 import org.myjerry.evenstar.service.BlogService;
 import org.myjerry.evenstar.service.ViewPostService;
 import org.myjerry.util.StringUtils;
@@ -37,6 +39,9 @@ public class ViewPostController extends MultiActionController {
 	@Autowired
 	private ViewPostService viewPostService;
 	
+	@Autowired
+	private BlogPreferenceService blogPreferenceService;
+	
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView mav = new ModelAndView();
 
@@ -53,7 +58,9 @@ public class ViewPostController extends MultiActionController {
 		model.put("olderPageUrl", olderPostUrl);
 		model.put("newerPageUrl", newerPostUrl);
 		
-		model = this.viewPostService.getPostsViewModel(blog, Arrays.asList(post), true, model);
+		boolean viewComments = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.showPostComments), true);
+		
+		model = this.viewPostService.getPostsViewModel(blog, Arrays.asList(post), viewComments, model);
 		String generatedBlogPage = TemplateHelper.generateBlogPage(blogID, model, blogLayoutService, velocityEngine);
 		
 		mav.addAllObjects(model);
@@ -131,6 +138,20 @@ public class ViewPostController extends MultiActionController {
 	 */
 	public void setViewPostService(ViewPostService viewPostService) {
 		this.viewPostService = viewPostService;
+	}
+
+	/**
+	 * @return the blogPreferenceService
+	 */
+	public BlogPreferenceService getBlogPreferenceService() {
+		return blogPreferenceService;
+	}
+
+	/**
+	 * @param blogPreferenceService the blogPreferenceService to set
+	 */
+	public void setBlogPreferenceService(BlogPreferenceService blogPreferenceService) {
+		this.blogPreferenceService = blogPreferenceService;
 	}
 
 }

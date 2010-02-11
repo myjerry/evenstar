@@ -135,7 +135,7 @@ public class ImportBlogHelper {
 				for(Object linkObject : entry.getLinks()) {
 					SyndLink link = (SyndLink) linkObject;
 					if("alternate".equals(link.getRel()) && "text/html".equals(link.getType())) {
-						postImport.setHref(link.getHref());
+						postImport.setHref(ServerUtils.getRelativeLink(link.getHref()));
 						break;
 					}
 				}

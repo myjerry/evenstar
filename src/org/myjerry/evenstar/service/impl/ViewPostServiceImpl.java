@@ -81,6 +81,9 @@ public class ViewPostServiceImpl implements ViewPostService {
 						Collection<Comment> comments = this.commentService.getPublishedCommentsForPost(post.getPostID(), blogID, 1000);
 						p.setComments(getCommentList(comments, blogID, commentTimeStampFormat));
 					}
+				} else {
+					// do not allow comments to be added
+					p.setAddCommentUrl(null);
 				}
 				list.add(p);
 			}
@@ -96,6 +99,7 @@ public class ViewPostServiceImpl implements ViewPostService {
 		model.put("isBlogAdmin", GAEUserUtil.isCurrentUserHost());
 		model.put("archive", archive);
 		model.put("labels", labels);
+		model.put("commentsAllowed", fetchComments);
 		
 		if(fetchComments) {
 			model.put("showComments", true);

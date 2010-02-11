@@ -4,7 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.myjerry.evenstar.enums.FeedFormat;
-import org.myjerry.evenstar.helper.ControllerHelper;
 import org.myjerry.evenstar.service.BlogService;
 import org.myjerry.evenstar.service.FeedService;
 import org.myjerry.util.StringUtils;
@@ -77,9 +76,9 @@ public class FeedController extends MultiActionController {
 		
 		// decipher the type of feed
 		if("posts/default".equals(uri)) {
-			return blogPostsFeed(blogID);
+			return blogPostsFeed(feedFormat, blogID);
 		} else if("comments/default".equals(uri)) {
-			return blogCommentsFeed(blogID);
+			return blogCommentsFeed(feedFormat, blogID);
 		} else if(uri.startsWith("posts/")) {
 			// try and get the post ID from this
 			uri = uri.substring(6);
@@ -89,9 +88,9 @@ public class FeedController extends MultiActionController {
 				if(postID != null) {
 					uri = uri.substring(index + 1);
 					if("default".equals(uri)) {
-						return blogPostFeed(blogID, postID);
+						return blogPostFeed(feedFormat, blogID, postID);
 					} else if("comments".equals(uri)) {
-						return blogPostCommentFeed(blogID, postID);
+						return blogPostCommentFeed(feedFormat, blogID, postID);
 					}
 				}
 			}
@@ -101,19 +100,23 @@ public class FeedController extends MultiActionController {
 		return null;
 	}
 	
-	private ModelAndView blogPostsFeed(Long blogID) {
+	private ModelAndView blogPostsFeed(FeedFormat feedFormat, Long blogID) {
+		String feedContents = this.feedService.getPostsFeed(feedFormat, blogID);
 		return getModelAndView("Blog All Posts Feed");
 	}
 
-	private ModelAndView blogCommentsFeed(Long blogID) {
+	private ModelAndView blogCommentsFeed(FeedFormat feedFormat, Long blogID) {
+		String feedContents = this.feedService.getCommentsFeed(feedFormat, blogID);
 		return getModelAndView("Blog All Comments Feed");
 	}
 
-	private ModelAndView blogPostFeed(Long blogID, Long postID) {
+	private ModelAndView blogPostFeed(FeedFormat feedFormat, Long blogID, Long postID) {
+		String feedContents = this.feedService.getPostFeed(feedFormat, blogID, postID);
 		return getModelAndView("Blog Post Feed");
 	}
 
-	private ModelAndView blogPostCommentFeed(Long blogID, Long postID) {
+	private ModelAndView blogPostCommentFeed(FeedFormat feedFormat, Long blogID, Long postID) {
+		String feedContents = this.feedService.getPostCommentFeed(feedFormat, blogID, postID);
 		return getModelAndView("Blog Comment Feed");
 	}
 	

@@ -59,14 +59,25 @@ public class BlogPostServiceImpl implements BlogPostService {
 			// this also means that we need to create a new URL for this service
 			int year = blogPost.getPostedDate().getYear() + 1900;
 			int month = blogPost.getPostedDate().getMonth() + 1;
-			String url = "/" + year + "/" + month + "/" + WebUtils.getUrlStringFromPostTitle(blogPost.getTitle());
+			String prefix = WebUtils.getUrlStringFromPostTitle(blogPost.getTitle());
+			String url = null;
+			if(StringUtils.isNotEmpty(prefix)) {
+				url = "/" + year + "/" + month + "/" + prefix;
+			}
 			
 			Blog blog = this.blogService.getBlog(blogPost.getBlogID());
-			if(StringUtils.isNotEmpty(blog.getAlias())) {
+			if(StringUtils.isNotEmpty(blog.getAlias()) && StringUtils.isNotEmpty(url)) {
 				url = "/" + blog.getAlias() + url;
 			}
 			
 			blogPost.setUrl(url);
+			if(StringUtils.isEmpty(url)) {
+				blogPost.setPostedDate(null);
+			}
+		} else {
+			if(!("/".equals(blogPost.getUrl().charAt(0)))) {
+				blogPost.setUrl("/" + blogPost.getUrl());
+			}
 		}
 		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
