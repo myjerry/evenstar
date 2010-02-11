@@ -21,6 +21,8 @@
 	<servlet-mapping>
 		<servlet-name>evenstar</servlet-name>
 		<url-pattern>*.html</url-pattern>
+		<url-pattern>*.atom</url-pattern>
+		<url-pattern>*.rss</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>

@@ -166,8 +166,6 @@
 		<put-attribute name="body" value="/WEB-INF/jsps/blog/emailPost.jsp" />
 	</definition>
 
-
-
 	<definition name=".tools.import.blog" extends=".masterLayout">
 		<put-attribute name="title" value="Import Blog" />
 		<put-attribute name="body" value="/WEB-INF/jsps/tools/importBlog.jsp" />
@@ -189,5 +187,7 @@
 	</definition>
 	
 	<definition name=".openid" template="/WEB-INF/jsps/openid/verify.jsp" />
-
+	
+	<definition name=".feed.output" template="/WEB-INF/jsps/feeds/feedOutput.jsp" />
+	
 </tiles-definitions>

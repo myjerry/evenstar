@@ -29,6 +29,8 @@ public interface BlogService {
 
 	public Long getBlogIDForServerName(String serverName);
 	
+	public Long getBlogIDForAlias(String alias);
+	
 	public boolean importBlog(Long blogID, BlogImportType importType, String blogData, boolean publishPosts);
 	
 }

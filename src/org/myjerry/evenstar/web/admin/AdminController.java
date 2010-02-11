@@ -35,30 +35,29 @@ public class AdminController extends MultiActionController {
 		Long defaultBlogID = this.blogService.getDefaultBlogID();
 		
 		List<BlogInfo> list = new ArrayList<BlogInfo>();
-		if(defaultBlogID != null) {
-			for(Blog blog : blogs) {
-				// check for the default blog
-				if(blog.getBlogID().equals(defaultBlogID)) {
-					mav.addObject("defaultBlog", blog);
-				}
-				
-				BlogInfo blogInfo = new BlogInfo(blog);
 
-				// also populate the number of posts in the blog
-				Long numPosts = this.blogPostService.getTotalPosts(blog.getBlogID());
-				blogInfo.setNumPosts(numPosts);
-				
-				// get last published date
-				Date lastPublishedDate = this.blogPostService.getLastPublishedPostDate(blog.getBlogID());
-				blogInfo.setLastPublishedDate(lastPublishedDate);
-				
-				// the number of unpublished comments
-				Long unpublishedComments = this.commentService.getNumUnpublishedCommentsForBlog(blog.getBlogID());
-				blogInfo.setUnpublishedComments(unpublishedComments);
-				
-				list.add(blogInfo);
+		for(Blog blog : blogs) {
+			// check for the default blog
+			if(defaultBlogID != null && blog.getBlogID().equals(defaultBlogID)) {
+				mav.addObject("defaultBlog", blog);
 			}
-		}		
+			
+			BlogInfo blogInfo = new BlogInfo(blog);
+
+			// also populate the number of posts in the blog
+			Long numPosts = this.blogPostService.getTotalPosts(blog.getBlogID());
+			blogInfo.setNumPosts(numPosts);
+			
+			// get last published date
+			Date lastPublishedDate = this.blogPostService.getLastPublishedPostDate(blog.getBlogID());
+			blogInfo.setLastPublishedDate(lastPublishedDate);
+			
+			// the number of unpublished comments
+			Long unpublishedComments = this.commentService.getNumUnpublishedCommentsForBlog(blog.getBlogID());
+			blogInfo.setUnpublishedComments(unpublishedComments);
+			
+			list.add(blogInfo);
+		}
 		
 		mav.setViewName(".admin");
 		mav.addObject("blogs", list);

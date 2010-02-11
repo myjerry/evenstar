@@ -2,11 +2,11 @@ package org.myjerry.evenstar.service;
 
 public interface FeedService {
 
-	public void updatePostFeed();
+	public void updatePostFeed(Long blogID);
 	
-	public String getPostFeed();
+	public String getPostFeed(Long blogID);
 	
-	public String getCommentsFeed();
+	public String getCommentsFeed(Long blogID);
 	
-	public String getPostCommentFeed(Long blogPostID);
+	public String getPostCommentFeed(Long postID, Long blogID);
 }

@@ -422,6 +422,30 @@ public class BlogServiceImpl implements BlogService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public Long getBlogIDForAlias(String alias) {
+		if(StringUtils.isEmpty(alias)) {
+			return null;
+		}
+
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Query query = manager.newQuery(Blog.class, "alias == aliasParam");
+			query.declareParameters("String aliasParam");
+			
+			List<Blog> blogs = (List<Blog>) query.execute(alias);
+			if(blogs != null && blogs.size() > 0) {
+				return blogs.get(0).getBlogID();
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
+		return null;
+	}
+
 	/**
 	 * @return the blogPostService
 	 */

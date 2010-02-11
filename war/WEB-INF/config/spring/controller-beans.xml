@@ -152,5 +152,9 @@
 	<bean name="deleteBlogController" class="org.myjerry.evenstar.web.tools.DeleteBlogController">
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
 	</bean>
+	
+	<bean name="feedController" class="org.myjerry.evenstar.web.feed.FeedController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+	</bean>
 
 </beans>

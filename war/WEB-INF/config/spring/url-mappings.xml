@@ -47,6 +47,9 @@
 				<prop key="/deleteComment.html">deleteCommentController</prop>
 				<prop key="/admin/moderateComments.html">moderateCommentsController</prop>
 				
+				<prop key="/**/*.atom">feedController</prop>
+				<prop key="/**/*.rss">feedController</prop>
+				
 				<prop key="/myAccount.html">userAccountController</prop>
 				
 				<prop key="/emailPost.html">emailPostController</prop>
