@@ -71,6 +71,9 @@ public class ViewPostServiceImpl implements ViewPostService {
 		String dateHeaderFormat = this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.postDateHeaderFormat);
 		String commentTimeStampFormat = this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.commentTimeStampFormat);
 
+		boolean quickEditing = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.quickEditing), true);
+		boolean emailLinks = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.emailLinks), true);
+		
 		Collection<BlogPostInfo> list = new ArrayList<BlogPostInfo>();
 		if(posts != null) {
 			for(BlogPost post : posts) {
@@ -85,6 +88,14 @@ public class ViewPostServiceImpl implements ViewPostService {
 					// do not allow comments to be added
 					p.setAddCommentUrl(null);
 				}
+				
+				if(!quickEditing) {
+					p.setEditUrl(null);
+				}
+				if(!emailLinks) {
+					p.setEmailPostUrl(null);
+				}
+				
 				list.add(p);
 			}
 		}

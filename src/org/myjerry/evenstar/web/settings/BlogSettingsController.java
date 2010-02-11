@@ -28,8 +28,8 @@ public class BlogSettingsController extends MultiActionController {
 		Blog blog = this.blogService.getBlog(StringUtils.getLong(blogID));
 		mav.addObject("blog", blog);
 		
-		Boolean quickEditing = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blog.getBlogID(), BlogPreferenceConstants.quickEditing));
-		Boolean emailPostLinks = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blog.getBlogID(), BlogPreferenceConstants.emailLinks));
+		Boolean quickEditing = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blog.getBlogID(), BlogPreferenceConstants.quickEditing), true);
+		Boolean emailPostLinks = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blog.getBlogID(), BlogPreferenceConstants.emailLinks), true);
 
 		mav.addObject("quickEditing", quickEditing);
 		mav.addObject("emailPostLinks", emailPostLinks);

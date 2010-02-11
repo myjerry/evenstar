@@ -27,11 +27,14 @@ public class BlogInfo {
 	private Long unpublishedComments;
 	
 	private Date lastPublishedDate;
+	
+	private String description;
 
 	public BlogInfo(Blog blog) {
 		this.blogID = blog.getBlogID();
 		this.title = blog.getTitle();
 		this.url = blog.getAddress();
+		this.description = blog.getDescription();
 	}
 
 	/**
@@ -186,6 +189,20 @@ public class BlogInfo {
 	 */
 	public void setBlogID(Long blogID) {
 		this.blogID = blogID;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	} 
 
 }
