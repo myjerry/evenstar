@@ -19,17 +19,31 @@
  */
 package org.myjerry.evenstar.helper;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.myjerry.evenstar.model.BlogPost;
 
 import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.feed.synd.SyndLink;
+import com.sun.syndication.feed.synd.SyndPerson;
 
 public class FeedGenerationHelper {
 
 	public static SyndFeed getPostsFeed(Collection<BlogPost> posts) {
+		SyndFeed feed = new SyndFeedImpl();
+		List<SyndLink> links = new ArrayList<SyndLink>();
+		List<SyndPerson> authors = new ArrayList<SyndPerson>();
 		
-		return null;
+		feed.setTitle("");
+		feed.setDescription("");
+		feed.setPublishedDate(null);
+		feed.setAuthors(authors);
+		feed.setLinks(links);
+		
+		return feed;
 	}
 
 	public static SyndFeed getPostFeed(BlogPost post) {

@@ -26,7 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.myjerry.evenstar.model.AutoApprovedCommentor;
 import org.myjerry.evenstar.model.BannedCommentor;
-import org.myjerry.evenstar.service.BlogService;
+import org.myjerry.evenstar.model.BlogAuthor;
+import org.myjerry.evenstar.model.BlogReader;
+import org.myjerry.evenstar.service.BlogUserService;
 import org.myjerry.evenstar.service.CommentService;
 import org.myjerry.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,37 +38,63 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 public class SecuritySettingsController extends MultiActionController {
 	
 	@Autowired
-	private BlogService blogService;
+	private CommentService commentService;
 	
 	@Autowired
-	private CommentService commentService;
+	private BlogUserService blogUserService;
 	
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView mav = new ModelAndView();
 		
 		Long blogID = StringUtils.getLong(request.getParameter("blogID"));
+		
+		Collection<BlogAuthor> authors = this.blogUserService.getBlogAuthors(blogID);
+		Collection<BlogReader> readers = this.blogUserService.getBlogReaders(blogID);
 		Collection<AutoApprovedCommentor> autoApprovals = this.commentService.getAutoApproveCommentors(blogID);
 		Collection<BannedCommentor> banned = this.commentService.getAutoRejectCommentors(blogID);
 		
+		mav.addObject("authors", authors);
+		mav.addObject("readers", readers);
 		mav.addObject("autoApprovals", autoApprovals);
 		mav.addObject("banned", banned);
+		
 		mav.addObject("blogID", blogID);
 		mav.setViewName(".admin.settings.security");
 		return mav;
 	}
-
-	/**
-	 * @return the blogService
-	 */
-	public BlogService getBlogService() {
-		return blogService;
+	
+	public ModelAndView addAuthors(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String blogAuthors = request.getParameter("blogAuthor");
+		Long blogID = StringUtils.getLong(request.getParameter("blogID"));
+		
+		if(StringUtils.isNotEmpty(blogAuthors)) {
+			String[] authors = StringUtils.split(blogAuthors, ",;");
+			if(authors != null && authors.length > 0) {
+				for(String author : authors) {
+					this.blogUserService.addBlogAuthor(author, blogID);
+				}
+			}
+		}
+		
+		ModelAndView mav = view(request, response);
+		return mav;
 	}
 
-	/**
-	 * @param blogService the blogService to set
-	 */
-	public void setBlogService(BlogService blogService) {
-		this.blogService = blogService;
+	public ModelAndView addReaders(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String blogReaders = request.getParameter("blogReader");
+		Long blogID = StringUtils.getLong(request.getParameter("blogID"));
+		
+		if(StringUtils.isNotEmpty(blogReaders)) {
+			String[] readers = StringUtils.split(blogReaders, ",;");
+			if(readers != null && readers.length > 0) {
+				for(String reader : readers) {
+					this.blogUserService.addBlogReader(reader, blogID);
+				}
+			}
+		}
+		
+		ModelAndView mav = view(request, response);
+		return mav;
 	}
 
 	/**
@@ -81,6 +109,20 @@ public class SecuritySettingsController extends MultiActionController {
 	 */
 	public void setCommentService(CommentService commentService) {
 		this.commentService = commentService;
+	}
+
+	/**
+	 * @return the blogUserService
+	 */
+	public BlogUserService getBlogUserService() {
+		return blogUserService;
+	}
+
+	/**
+	 * @param blogUserService the blogUserService to set
+	 */
+	public void setBlogUserService(BlogUserService blogUserService) {
+		this.blogUserService = blogUserService;
 	}
 
 }

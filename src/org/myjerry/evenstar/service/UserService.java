@@ -29,6 +29,8 @@ public interface UserService {
 	
 	public EvenstarUser getEvenstarUser(String email);
 	
+	public boolean isEvenstarUser(String email);
+	
 	public EvenstarUser getEvenstarUserForUri(String uri);
 
 	public EvenstarUser getEvenstarUser(Long userID);

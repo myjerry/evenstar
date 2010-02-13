@@ -27,6 +27,8 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.myjerry.util.ServerUtils;
+
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class EvenstarUser {
 	
@@ -47,7 +49,13 @@ public class EvenstarUser {
 	private String email;
 	
 	@Persistent
-	private Date joinedOn;
+	private Date joinedOn = ServerUtils.getServerDate();
+	
+	@Persistent
+	private Boolean admin = false;
+	
+	@Persistent
+	private String googleUserID;
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -72,6 +80,13 @@ public class EvenstarUser {
 			return true;
 		}
 		
+		return false;
+	}
+	
+	public boolean isAdmin() {
+		if(this.admin != null) {
+			return this.admin.booleanValue();
+		}
 		return false;
 	}
 	
@@ -157,6 +172,34 @@ public class EvenstarUser {
 	 */
 	public void setProvider(String provider) {
 		this.provider = provider;
+	}
+
+	/**
+	 * @return the admin
+	 */
+	public Boolean getAdmin() {
+		return admin;
+	}
+
+	/**
+	 * @param admin the admin to set
+	 */
+	public void setAdmin(Boolean admin) {
+		this.admin = admin;
+	}
+
+	/**
+	 * @return the googleUserID
+	 */
+	public String getGoogleUserID() {
+		return googleUserID;
+	}
+
+	/**
+	 * @param googleUserID the googleUserID to set
+	 */
+	public void setGoogleUserID(String googleUserID) {
+		this.googleUserID = googleUserID;
 	}
 
 }

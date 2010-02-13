@@ -35,13 +35,14 @@ import org.myjerry.evenstar.service.BlogLayoutService;
 import org.myjerry.evenstar.service.BlogPostService;
 import org.myjerry.evenstar.service.BlogPreferenceService;
 import org.myjerry.evenstar.service.BlogService;
+import org.myjerry.evenstar.service.UserService;
 import org.myjerry.evenstar.service.ViewPostService;
+import org.myjerry.evenstar.web.EvenstarController;
 import org.myjerry.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
-public class ViewPostController extends MultiActionController {
+public class ViewPostController extends EvenstarController {
 	
 	@Autowired
 	private BlogService blogService;
@@ -61,8 +62,12 @@ public class ViewPostController extends MultiActionController {
 	@Autowired
 	private BlogPreferenceService blogPreferenceService;
 	
+	@Autowired
+	private UserService userService;
+	
+	@SuppressWarnings("unchecked")
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ModelAndView mav = new ModelAndView();
+		ModelAndView mav = getModelAndView(request);
 
 		Long blogID = StringUtils.getLong(request.getParameter("blogID"));
 		Long postID = StringUtils.getLong(request.getParameter("postID"));
@@ -79,6 +84,7 @@ public class ViewPostController extends MultiActionController {
 		
 		boolean viewComments = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.showPostComments), true);
 		
+		model.putAll(mav.getModel());
 		model = this.viewPostService.getPostsViewModel(blog, Arrays.asList(post), viewComments, model);
 		String generatedBlogPage = TemplateHelper.generateBlogPage(blogID, model, blogLayoutService, velocityEngine);
 		
@@ -171,6 +177,20 @@ public class ViewPostController extends MultiActionController {
 	 */
 	public void setBlogPreferenceService(BlogPreferenceService blogPreferenceService) {
 		this.blogPreferenceService = blogPreferenceService;
+	}
+
+	/**
+	 * @return the userService
+	 */
+	public UserService getUserService() {
+		return userService;
+	}
+
+	/**
+	 * @param userService the userService to set
+	 */
+	public void setUserService(UserService userService) {
+		this.userService = userService;
 	}
 
 }

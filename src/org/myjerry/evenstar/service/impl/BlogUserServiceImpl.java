@@ -28,28 +28,42 @@ import javax.jdo.Query;
 
 import org.myjerry.evenstar.model.BlogAuthor;
 import org.myjerry.evenstar.model.BlogReader;
+import org.myjerry.evenstar.model.EvenstarUser;
 import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
 import org.myjerry.evenstar.service.BlogUserService;
+import org.myjerry.evenstar.service.UserService;
 import org.myjerry.util.GAEUserUtil;
 import org.myjerry.util.ServerUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class BlogUserServiceImpl implements BlogUserService {
+	
+	@Autowired
+	private UserService userService;
 
 	@Override
-	public boolean isPostAllowedForUser(Long postID, Long blogID) {
+	public boolean isPostAllowedForUser(Long userID, Long postID, Long blogID) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean isUserBlogAdmin(Long blogID) {
+	public boolean isUserBlogAdmin(Long userID, Long blogID) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean isUserBlogReader(Long blogID) {
-		// TODO Auto-generated method stub
+	public boolean isUserBlogReader(Long userID, Long blogID) {
+		if(userID == null || blogID == null) {
+			return false;
+		}
+		
+		EvenstarUser user = this.userService.getEvenstarUser(userID);
+		if(user != null) {
+			return existsBlogAuthor(user.getEmail(), blogID);
+		}
+		
 		return false;
 	}
 
@@ -249,6 +263,20 @@ public class BlogUserServiceImpl implements BlogUserService {
 	    	manager.close();
 	    }
 		return null;
+	}
+
+	/**
+	 * @return the userService
+	 */
+	public UserService getUserService() {
+		return userService;
+	}
+
+	/**
+	 * @param userService the userService to set
+	 */
+	public void setUserService(UserService userService) {
+		this.userService = userService;
 	}
 
 }

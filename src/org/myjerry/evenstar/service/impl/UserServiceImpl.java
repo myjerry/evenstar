@@ -21,6 +21,7 @@ package org.myjerry.evenstar.service.impl;
 
 import java.util.List;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -28,6 +29,9 @@ import org.myjerry.evenstar.model.EvenstarUser;
 import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
 import org.myjerry.evenstar.service.UserService;
 import org.myjerry.util.StringUtils;
+
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 public class UserServiceImpl implements UserService {
 
@@ -68,7 +72,22 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public EvenstarUser getEvenstarUser(Long userID) {
-		// TODO Auto-generated method stub
+		if(userID == null) {
+			return null;
+		}
+		
+		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
+		try {
+			Key key = KeyFactory.createKey(EvenstarUser.class.getSimpleName(), userID);
+			EvenstarUser user = manager.getObjectById(EvenstarUser.class, key);
+			return manager.detachCopy(user);
+		} catch(JDOObjectNotFoundException e) {
+			// do nothing
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			manager.close();
+		}
 		return null;
 	}
 
@@ -138,6 +157,14 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public boolean addEvenstarUser(EvenstarUser evenstarUser) {
+		if(evenstarUser == null) {
+			return false;
+		}
+		
+		if(StringUtils.isEmpty(evenstarUser.getEmail()) && StringUtils.isEmpty(evenstarUser.getHomePage())) {
+			return false;
+		}
+		
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		
 		EvenstarUser exist = getEvenstarUser(evenstarUser.getEmail());
@@ -157,6 +184,20 @@ public class UserServiceImpl implements UserService {
 			e.printStackTrace();
 		} finally {
 			manager.close();
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean isEvenstarUser(String email) {
+		if(StringUtils.isEmpty(email)) {
+			return false;
+		}
+		
+		EvenstarUser user = getEvenstarUser(email);
+		if(user != null) {
+			return true;
 		}
 		
 		return false;

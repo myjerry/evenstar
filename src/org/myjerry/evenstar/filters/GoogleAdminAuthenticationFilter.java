@@ -32,7 +32,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.myjerry.evenstar.model.EvenstarAdminUser;
+import org.myjerry.evenstar.model.EvenstarUser;
 import org.myjerry.evenstar.persistence.PersistenceManagerFactoryImpl;
 
 import com.google.appengine.api.users.User;
@@ -78,10 +78,11 @@ public class GoogleAdminAuthenticationFilter implements Filter {
 	private void addUserAsAdmin(User user) {
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		try {
-			EvenstarAdminUser adminUser = new EvenstarAdminUser();
+			EvenstarUser adminUser = new EvenstarUser();
 			adminUser.setEmail(user.getEmail());
 			adminUser.setGoogleUserID(user.getUserId());
 			adminUser.setUserName(user.getNickname());
+			adminUser.setAdmin(true);
 			
 			manager.makePersistent(adminUser);
 		} catch(Exception e) {
@@ -95,10 +96,10 @@ public class GoogleAdminAuthenticationFilter implements Filter {
 	private static final boolean checkUserPresentAsAdmin(String googleUserID) {
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
 		try {
-			Query query = manager.newQuery(EvenstarAdminUser.class, "googleUserID == googleUserIDParam");
+			Query query = manager.newQuery(EvenstarUser.class, "googleUserID == googleUserIDParam");
 			query.declareParameters("String googleUserIDParam");
 			
-			List<EvenstarAdminUser> users = (List<EvenstarAdminUser>) query.execute(googleUserID);
+			List<EvenstarUser> users = (List<EvenstarUser>) query.execute(googleUserID);
 			if(users != null && users.size() == 1) {
 				return true;
 			}

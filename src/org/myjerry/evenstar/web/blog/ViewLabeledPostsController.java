@@ -41,14 +41,15 @@ import org.myjerry.evenstar.service.BlogPreferenceService;
 import org.myjerry.evenstar.service.BlogService;
 import org.myjerry.evenstar.service.BlogUserService;
 import org.myjerry.evenstar.service.CommentService;
+import org.myjerry.evenstar.service.UserService;
 import org.myjerry.evenstar.service.ViewPostService;
+import org.myjerry.evenstar.web.EvenstarController;
 import org.myjerry.util.ServerUtils;
 import org.myjerry.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
-public class ViewLabeledPostsController extends MultiActionController {
+public class ViewLabeledPostsController extends EvenstarController {
 	
 	@Autowired
 	private BlogService blogService;
@@ -77,6 +78,10 @@ public class ViewLabeledPostsController extends MultiActionController {
 	@Autowired
 	private ViewPostService viewPostService;
 	
+	@Autowired
+	private UserService userService;
+	
+	@SuppressWarnings("unchecked")
 	public ModelAndView view(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String label = request.getParameter("label");
 		Long older = StringUtils.getLong(request.getParameter("older"));
@@ -85,7 +90,7 @@ public class ViewLabeledPostsController extends MultiActionController {
 		Long blogID = ControllerHelper.convertToBlogID(request, this.blogService);
 		Long labelID = this.blogLabelService.getLabelID(blogID, label);
 		
-		ModelAndView mav = new ModelAndView();
+		ModelAndView mav = getModelAndView(request);
 		
 		if(blogID == null || labelID == null) {
 			mav.setViewName(".evenstar");
@@ -121,6 +126,7 @@ public class ViewLabeledPostsController extends MultiActionController {
 				}
 			}
 			
+			model.putAll(mav.getModel());
 			model = this.viewPostService.getPostsViewModel(blog, posts, false, model);
 			String generatedBlogPage = TemplateHelper.generateBlogPage(blogID, model, blogLayoutService, velocityEngine);
 			
@@ -256,6 +262,20 @@ public class ViewLabeledPostsController extends MultiActionController {
 	 */
 	public void setViewPostService(ViewPostService viewPostService) {
 		this.viewPostService = viewPostService;
+	}
+
+	/**
+	 * @return the userService
+	 */
+	public UserService getUserService() {
+		return userService;
+	}
+
+	/**
+	 * @param userService the userService to set
+	 */
+	public void setUserService(UserService userService) {
+		this.userService = userService;
 	}
 
 }

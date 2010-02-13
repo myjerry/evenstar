@@ -103,4 +103,8 @@ public class StringUtils {
 		}
 		return defaultValue;
 	}
+	
+	public static String[] split(String string, String separatorChars) {
+		return org.apache.commons.lang.StringUtils.split(string, separatorChars);
+	}
 }

@@ -27,11 +27,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.myjerry.evenstar.constants.BlogPreferenceConstants;
+import org.myjerry.evenstar.constants.EvenstarConstants;
 import org.myjerry.evenstar.model.Blog;
 import org.myjerry.evenstar.model.BlogArchive;
 import org.myjerry.evenstar.model.BlogLabel;
 import org.myjerry.evenstar.model.BlogPost;
 import org.myjerry.evenstar.model.Comment;
+import org.myjerry.evenstar.model.EvenstarUser;
 import org.myjerry.evenstar.service.BlogArchiveService;
 import org.myjerry.evenstar.service.BlogLabelService;
 import org.myjerry.evenstar.service.BlogPreferenceService;
@@ -92,27 +94,36 @@ public class ViewPostServiceImpl implements ViewPostService {
 
 		boolean quickEditing = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.quickEditing), true);
 		boolean emailLinks = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.emailLinks), true);
+		boolean commentsAllowed = StringUtils.getBoolean(this.blogPreferenceService.getPreference(blogID, BlogPreferenceConstants.showPostComments), true);
+		
+		EvenstarUser user = (EvenstarUser) model.get(EvenstarConstants.EVENSTAR_MODEL_ATTRIBUTE_NAME);
+		boolean isUserBlogAdmin = false;
+		if(user != null) {
+			isUserBlogAdmin = this.blogUserService.isUserBlogAdmin(user.getUserID(), blogID);
+		}
 		
 		Collection<BlogPostInfo> list = new ArrayList<BlogPostInfo>();
 		if(posts != null) {
 			for(BlogPost post : posts) {
-				BlogPostInfo p = getBlogPostInfo(post, dateHeaderFormat, blog.getBlogID(), blog.getRestrictedPostText());
+				BlogPostInfo p = getBlogPostInfo(post, dateHeaderFormat, blog.getBlogID(), user, blog.getRestrictedPostText());
 				if(fetchComments) {
 					if(p.isRestricted()) {
 						// get the comments
 						Collection<Comment> comments = this.commentService.getPublishedCommentsForPost(post.getPostID(), blogID, 1000);
-						p.setComments(getCommentList(comments, blogID, commentTimeStampFormat));
+						p.setComments(getCommentList(comments, blogID, user, commentTimeStampFormat));
 					}
-				} else {
-					// do not allow comments to be added
-					p.setAddCommentUrl(null);
 				}
 				
-				if(!quickEditing) {
+				if(!(isUserBlogAdmin && quickEditing)) {
 					p.setEditUrl(null);
 				}
-				if(!emailLinks) {
+				
+				if(p.isRestricted() || !emailLinks) {
 					p.setEmailPostUrl(null);
+				}
+				
+				if(p.isRestricted() || !commentsAllowed) {
+					p.setAddCommentUrl(null);
 				}
 				
 				list.add(p);
@@ -129,16 +140,12 @@ public class ViewPostServiceImpl implements ViewPostService {
 		model.put("isBlogAdmin", GAEUserUtil.isCurrentUserHost());
 		model.put("archive", archive);
 		model.put("labels", labels);
-		model.put("commentsAllowed", fetchComments);
-		
-		if(fetchComments) {
-			model.put("showComments", true);
-		}
+		model.put("commentsAllowed", commentsAllowed);
 		
 		return model;
 	}
 
-	public BlogPostInfo getBlogPostInfo(BlogPost post, String dateHeaderFormat, Long blogID, String restrictedPostText) {
+	public BlogPostInfo getBlogPostInfo(BlogPost post, String dateHeaderFormat, Long blogID, EvenstarUser user, String restrictedPostText) {
 		if(StringUtils.isEmpty(dateHeaderFormat)) {
 			dateHeaderFormat = "EEEE, MMMM d, yyyy";
 		}
@@ -148,43 +155,54 @@ public class ViewPostServiceImpl implements ViewPostService {
 
 		// check for security settings
 		boolean allowed = false;
-		if(post.getPrivacyMode() == null) {
-			post.setPrivacyMode(BlogPost.PRIVACY_MODE_PUBLIC);
+		
+		if(GAEUserUtil.isCurrentUserHost()) {
+			allowed = true;
+		} else {
+			if(post.getPrivacyMode() == null) {
+				post.setPrivacyMode(BlogPost.PRIVACY_MODE_PUBLIC);
+			}
+
+			switch(post.getPrivacyMode()) {
+				case BlogPost.PRIVACY_MODE_PRIVATE:
+					// the post is only for blog authors
+					if(user != null) {
+						allowed = this.blogUserService.isUserBlogAdmin(user.getUserID(), blogID);
+					}
+					break;
+					
+				case BlogPost.PRIVACY_MODE_RESTRICTED:
+					// the post is restricted to blog readers
+					if(user != null) {
+						allowed = this.blogUserService.isUserBlogReader(user.getUserID(), blogID);
+					}
+					break;
+					
+				case BlogPost.PRIVACY_MODE_CUSTOM:
+					// the post is restricted to specific readers
+					if(user != null) {
+						allowed = this.blogUserService.isPostAllowedForUser(user.getUserID(), post.getPostID(), blogID);
+					}
+					break;
+					
+				case BlogPost.PRIVACY_MODE_PUBLIC:
+				default:
+					// do nothing
+					allowed = true;
+					break;
+			}
 		}
-		switch(post.getPrivacyMode()) {
-			
-			case BlogPost.PRIVACY_MODE_PRIVATE:
-				// the post is only for blog authors
-				allowed = blogUserService.isUserBlogAdmin(blogID);
-				break;
-				
-			case BlogPost.PRIVACY_MODE_RESTRICTED:
-				// the post is restricted to blog readers
-				allowed = blogUserService.isUserBlogReader(blogID);
-				break;
-				
-			case BlogPost.PRIVACY_MODE_CUSTOM:
-				// the post is restricted to specific readers
-				allowed = blogUserService.isPostAllowedForUser(post.getPostID(), blogID);
-				break;
-				
-			case BlogPost.PRIVACY_MODE_PUBLIC:
-			default:
-				// do nothing
-				allowed = true;
-				break;
-		}
-		p.setRestricted(allowed);
+		p.setRestricted(!allowed);
 		if(!allowed) {
 			p.setBody(restrictedPostText);
 		}
 		
-		p.setNumComments(commentService.getTotalPublishedCommentsOnPost(p.getId(), blogID));
+		p.setNumComments(this.commentService.getTotalPublishedCommentsOnPost(p.getId(), blogID));
 		
 		return p;
 	}
 
-	public List<CommentInfo> getCommentList(Collection<Comment> comments, Long blogID, String commentTimeStampFormat) {
+	public List<CommentInfo> getCommentList(Collection<Comment> comments, Long blogID, EvenstarUser user, String commentTimeStampFormat) {
 		List<CommentInfo> list = new ArrayList<CommentInfo>();
 		
 		if(StringUtils.isEmpty(commentTimeStampFormat)) {
@@ -192,7 +210,7 @@ public class ViewPostServiceImpl implements ViewPostService {
 		}
 		
 		// check if the current user has permission to view the comment
-		boolean allowed = blogUserService.isUserBlogAdmin(blogID);
+		boolean allowed = this.blogUserService.isUserBlogAdmin(user.getUserID(), blogID);
 		
 		if(comments != null) {
 			for(Comment comment : comments) {

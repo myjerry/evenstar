@@ -27,11 +27,11 @@ import org.myjerry.evenstar.model.BlogReader;
 
 public interface BlogUserService {
 	
-	public boolean isUserBlogAdmin(Long blogID);
+	public boolean isUserBlogAdmin(Long userID, Long blogID);
 	
-	public boolean isUserBlogReader(Long blogID);
+	public boolean isUserBlogReader(Long userID, Long blogID);
 	
-	public boolean isPostAllowedForUser(Long postID, Long blogID);
+	public boolean isPostAllowedForUser(Long userID, Long postID, Long blogID);
 	
 
 	public boolean addBlogAuthor(String emailAddress, Long blogID);
