@@ -16,6 +16,9 @@
 <div class="form">
 	<form name="evenstarForm" method="post">
 
+		<input id="actionParam" name="_action" type="hidden" />
+		<input name="blogID" value="${blogID}" type="hidden" />
+
 		<div class="tabs" style="width: 826px;">
 			<table cellpadding="0" cellspacing="0" border="0">
 				<tr>
@@ -100,28 +103,28 @@
 			<div class="form-row">
 				<label>Add Blog Authors</label>
 				<div class="form-row-input">
-					<input name="blogAuthor" maxlength="100" size="50" />
+					<input name="blogAuthor" maxlength="100" size="50" /> &nbsp; <a href="javascript:submitForm('addAuthors');">Add Authors</a>
 				</div>
 			</div>
 
 			<div class="form-row">
 				<label>Add Blog Readers</label>
 				<div class="form-row-input">
-					<input name="blogReader" maxlength="100" size="50" />
+					<input name="blogReader" maxlength="100" size="50" /> &nbsp; <a href="javascript:submitForm('addReaders');">Add Readers</a>
 				</div>
 			</div>
 			
 			<div class="form-row">
 				<label>Add Auto-Approval Commentors</label>
 				<div class="form-row-input">
-					<input name="autoApprover" maxlength="100" size="50" />
+					<input name="autoApprover" maxlength="100" size="50" /> &nbsp; <a href="">Add Approved Commentors</a>
 				</div>
 			</div>
 			
 			<div class="form-row">
 				<label>Add Banned Commentors</label>
 				<div class="form-row-input">
-					<input name="autoReject" maxlength="100" size="50" />
+					<input name="autoReject" maxlength="100" size="50" /> &nbsp; <a href="">Add Banned Commentors</a>
 				</div>
 			</div>
 			

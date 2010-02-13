@@ -54,10 +54,12 @@
 	
 	<bean name="blogHomeController" class="org.myjerry.evenstar.web.blog.BlogHomeController">
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="userService" ref="userService" />
 	</bean>
 	
 	<bean name="viewLabeledPostsController" class="org.myjerry.evenstar.web.blog.ViewLabeledPostsController">
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="userService" ref="userService" />
 	</bean>
 	
 	<bean name="layoutController" class="org.myjerry.evenstar.web.layout.LayoutController">
@@ -93,6 +95,7 @@
 	
 	<bean name="viewPostController" class="org.myjerry.evenstar.web.blog.ViewPostController" >
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+		<property name="userService" ref="userService" />
 	</bean>
 	
 	<bean name="emailPostController" class="org.myjerry.evenstar.web.blog.EmailPostController">
@@ -102,7 +105,6 @@
 	
 	<bean name="securitySettingsController" class="org.myjerry.evenstar.web.settings.SecuritySettingsController">
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
-		<property name="blogService" ref="blogService" />
 		<property name="commentService" ref="commentService" />
 	</bean>
 	
@@ -154,6 +156,10 @@
 	</bean>
 	
 	<bean name="feedController" class="org.myjerry.evenstar.web.feed.FeedController">
+		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
+	</bean>
+
+	<bean name="signInController" class="org.myjerry.evenstar.web.user.SignInController">
 		<property name="methodNameResolver" ref="parameterMethodNameResolverWithDefaultMethod" />
 	</bean>
 

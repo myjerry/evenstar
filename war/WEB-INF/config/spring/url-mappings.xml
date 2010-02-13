@@ -56,6 +56,8 @@
 				
 				<prop key="/openid.html">forwardController</prop>
 				
+				<prop key="/signIn.html">signInController</prop>
+				
 				<!-- For all other URIs that do not match, forward the user to a generic Page Not Found page. -->
         		<prop key="/**">pageNotFoundController</prop>
 			</props>

@@ -11,89 +11,7 @@
 </script>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script> 
-
-<script type="text/javascript"> 
-//<!--
-function getCenteredCoords(width, height) {
-  return {x: $(window).width()/2-width/2, y: $(window).height()/2-height/2};
-}
- 
-function handleOpenIDResponse(openid_args) {
-  $("#login").hide();
-  $("#msg").html("<p>Verifying authentication ...</p>");
-  $.ajax({
-    type: "POST",
-    url: "/openidVerify.html",
-    data: openid_args,
-    dataType: "json",
-    success: function(user){
-      $("#logout").show();
-      $("#msg").html("<p><span class='green'>" + user.b + "</span> is authenticated.</p>")
-      var renderDiv = $("#info > div").hide();
-      renderDiv.find("span").empty();
-      renderDiv.show();
-      var info = user.g ? user.g.axschema : {};
-      alert(info);
-      for(var i in info) {
-          alert(i);
-        renderDiv.find("span." + i).html(info[i])
-      }
-    },
-    error: function(xhr, errStatus, errMessage) {
-      $("#login").show();
-      $("#logout").hide();
-      $("#msg").html("<p class='red'>Login failed.  Please try again.</p>");
-      $("#info > div").hide().find("span").empty();
-    }
-  });
-}
- 
-$(function(){
-  $("#login").click(function(e){
-    var w = window.open("/openid.html", "openid_popup", "width=450,height=500,location=1,status=1,resizable=yes");
-    var coords = getCenteredCoords(450,500);
-    w.moveTo(coords.x, coords.y);
-  });
-  $("#logout").click(function(e){
-    $.ajax({
-      type: "GET",
-      url: "/openidVerify.html?logout=true",
-      success: function(text){
-        $("#logout").hide();
-        $("#login").show();
-        $("#msg").html("<p>You are currently not logged in.</p>");
-        $("#info > div").hide().find("span").empty();
-      }
-    });
-  });
-  $.ajax({
-    type: "GET",
-    url: "/openidVerify.html",
-    dataType: "json",
-    success: function(user){
-      $(".init").hide().removeClass("init");
-      $("#login").hide();
-      $("#logout").show();
-      $("#msg").html("<p><span class='green'>" + user.b + "</span> is authenticated.</p>");
-      var renderDiv = $("#info > div").hide();
-      renderDiv.find("span").empty();
-      renderDiv.show();
-      var info = user.g ? user.g.info : {};
-      for(var i in info)
-        renderDiv.find("span." + i).html(info[i])
-    },
-    error: function(xhr, errStatus, errMessage) {
-      $("#logout").hide();
-      $("#login").show();
-      $("#msg").html("<p>You are currently not logged in.</p>");
-      $("#info > div").hide().find("span").empty();
-      $(".init").hide().removeClass("init").show(1000);
-    }
-  });
-  
-});
-//-->
-</script> 
+<script type="text/javascript" src="/assets/js/signin.js"></script>
 
 <h2 class="workflow">${post.title} (${blog.title})</h2>
 
@@ -181,9 +99,7 @@ $(function(){
 				<div class="form-row">
 					<label>Confirm Identity</label>
 					<div class="form-widget-container">
-						<mj:core.radio value="google" name="identity" selectedValue="${identity}" /><label>Google Account</label>
-						<br clear="all" />
-						<mj:core.radio value="openid" name="identity" selectedValue="${identity}" /><label>Open ID</label>
+						<mj:core.radio value="openid" name="identity" selectedValue="${identity}" onDefault="true" /><label>Open ID</label>
 						<br clear="all" />
 						<mj:core.radio value="namedurl" name="identity" selectedValue="${identity}" /><label>Name/URL</label>
 						<br clear="all" />

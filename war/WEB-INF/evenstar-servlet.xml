@@ -55,5 +55,19 @@
 	<import resource="config/spring/services-beans.xml" />
 	<import resource="config/spring/controller-beans.xml" />
 	<import resource="config/spring/url-mappings.xml" />
+
+	<bean
+		class="org.springframework.web.context.support.ServletContextAttributeExporter">
+		<property name="attributes">
+			<map>
+				<!--
+					inject the following beans into the servlet context so the servlets can access them.
+				-->
+				<entry key="userService">
+					<ref bean="userService" />
+				</entry>
+			</map>
+		</property>
+	</bean>
 	
 </beans>
