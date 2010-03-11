@@ -94,7 +94,8 @@ public class BlogPostServiceImpl implements BlogPostService {
 				blogPost.setPostedDate(null);
 			}
 		} else {
-			if(!("/".equals(blogPost.getUrl().charAt(0)))) {
+			char firstChar = blogPost.getUrl().charAt(0);
+			if(firstChar != '/') {
 				blogPost.setUrl("/" + blogPost.getUrl());
 			}
 		}

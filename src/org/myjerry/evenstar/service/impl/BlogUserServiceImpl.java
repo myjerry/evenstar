@@ -61,7 +61,7 @@ public class BlogUserServiceImpl implements BlogUserService {
 		
 		EvenstarUser user = this.userService.getEvenstarUser(userID);
 		if(user != null) {
-			return existsBlogAuthor(user.getEmail(), blogID);
+			return existsBlogReader(user.getEmail(), blogID);
 		}
 		
 		return false;
@@ -245,7 +245,7 @@ public class BlogUserServiceImpl implements BlogUserService {
 	@Override
 	public Collection<BlogReader> getBlogReaders(Long blogID) {
 		PersistenceManager manager = PersistenceManagerFactoryImpl.getPersistenceManager();
-		Query query = manager.newQuery(BlogAuthor.class);
+		Query query = manager.newQuery(BlogReader.class);
 	    query.setFilter("blogID == blogIDParam");
 	    query.declareParameters("String blogIDParam");
 	    

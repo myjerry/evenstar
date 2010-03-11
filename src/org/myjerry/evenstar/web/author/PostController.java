@@ -127,6 +127,9 @@ public class PostController extends MultiActionController {
 		post.setBlogID(blogID);
 		post.setTitle(request.getParameter("postTitle"));
 		post.setContents(request.getParameter("postContents"));
+		
+		post.setUrl(request.getParameter("customURL"));
+		
 		String labels = request.getParameter("labels");
 		if(StringUtils.isEmpty(labels)) {
 			post.setLabels("");
